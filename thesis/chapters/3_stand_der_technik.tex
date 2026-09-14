@@ -1,0 +1,228 @@
+\chapter{Stand der Technik}
+\label{chap:stand-der-technik}
+
+Auf dem aktuellen Markt der professionellen Veranstaltungstechnik existieren 
+bereits verschiedene kommerzielle Lösungen für kabellose und kabelgebundene LED-Röhrensysteme. 
+Nachfolgend werden ausgewählte, marktführende Produkte 
+hinsichtlich ihres Funktionsumfangs, ihres Einsatzbereiches und ihrer 
+Kostenstrukturen analysiert, um den aktuellen Stand der Technik abzubilden 
+und Lücken im bestehenden Angebot aufzuzeigen. 
+
+\section{Kommerzielle LED-Leuchtröhren}
+\label{sec:kommerzielle-led-leuchtroehren}
+
+\subsection{Premium-Segment: Astera Titan Tube}
+Als gegenwärtiger Marktführer im Bereich autarker und per Funk steuerbarer 
+LED-Röhren gilt das Unternehmen Astera mit seinem Modell \textit{Titan Tube}. 
+Dabei handelt es sich um eine einen Meter lange LED-Röhre, die auf einer 
+RGBWMA-Pixelarchitektur (Red, Green, Blue, Mint, Amber) basiert. Durch die 
+Hinzunahme der Mint- und Amber-Dioden ermöglicht das System eine
+Anpassung des Weißabgleichs. 
+Aufgrund dieser Eigenschaften eignet sich die Röhre neben dem Einsatz im 
+Eventbereich auch für professionelle Fotografie- und Videografieproduktionen.
+
+Für die kabellose Kommunikation unterstützt das System Wireless DMX
+im 2,4-GHz-Frequenzband. Für den mobilen 
+Einsatz verfügt die Röhre über einen integrierten Akku, der bei maximaler 
+Helligkeit und Ausgabe von reinem Weiß eine spezifizierte Laufzeit von etwa 
+1 Stunde und 45 Minuten erreicht. Die Schutzklasse IP65 zertifiziert das 
+Gehäuse zusätzlich als staubdicht und strahlwassergeschützt, was eine 
+zuverlässige Nutzung im Außenbereich garantiert.
+
+Darüber hinaus unterstützt die Titan Tube eine
+kabelgebundene Pixelsteuerung über die etablierten Protokolle DMX512 sowie 
+Art-Net. Dieser Betriebsmodus ist aufgrund der hohen Datenrate jedoch an den Betrieb
+über Kabel gebunden. Die hohe Funktionsdichte 
+und Verarbeitungsqualität spiegelt sich in der Preisstruktur 
+wider: Eine einzelne Röhre kostet ca. 800€, während ein Komplettset 
+aus acht Röhren inklusive Transportbox und Ladegerät mit rund 
+7.000€ kalkuliert ist.
+
+\subsection{Kostengünstige Alternativen: BeamZ Zelos}
+Als preisgünstigere Alternative im professionellen Segment lassen sich 
+Systeme wie das Modell \textit{Zelos} des Herstellers BeamZ identifizieren. 
+Diese Systeme richten sich mit einem Gesamtpreis von etwa 3.000€ für 
+ein 8er-Set (was rund 400€ pro Röhre entspricht) primär an Anwendungsfälle 
+im Veranstaltungsbetrieb. 
+
+Zwar verfügt auch dieses System über eine drahtlose DMX-Ansteuerung im 
+2,4-GHz-Band, jedoch bindet es den Einsatzbereich an einen reinen Netzbetrieb.
+Ein weitaus signifikanterer Nachteil gegenüber dem 
+Premiumsegment ist das Fehlen von Datenschnittstellen für eine kabelgebundene 
+Pixelsteuerung. Die Ansteuerung beschränkt sich somit auf die grundlegende 
+Funkbedienung ohne die Systemflexibilität für ein hochauflösendes, 
+drahtgebundenes Pixel-Mapping (etwa via Art-Net).
+
+\section{Wissenschaftliche Forschung und verwandte Konzepte}
+\label{sec:wissenschaftliche-forschung}
+
+Neben den am Markt verfügbaren Produkten existieren wissenschaftliche Arbeiten,
+die sich mit der drahtlosen Übertragung von Lichtsteuerdaten befassen. Der
+folgende Abschnitt ordnet diese Ansätze ein und grenzt sie gegenüber dem in
+dieser Arbeit verfolgten Konzept ab.
+
+\subsection{Drahtlose Kommunikationsprotokolle in der Beleuchtungstechnik}
+\label{subsec:forschung-kommunikation}
+
+Die Ablösung der kabelgebundenen DMX512-Übertragung durch eine Funkstrecke ist
+bereits Gegenstand wissenschaftlicher Untersuchungen. Yang et al. stellen mit
+\textit{WiDMX512} ein System vor, das die Nachteile der klassischen
+Bus-Topologie explizit zum Ausgangspunkt nimmt: Die kabelgebundene Verkettung
+von Master und Slaves erhöhe die Systemkomplexität insbesondere bei großen
+Leitungslängen, schränke Mobilität und Skalierbarkeit ein und verursache
+zusätzlichen Material- und Personalaufwand \cite{yang2015real}. Diese
+Problemanalyse deckt sich unmittelbar mit der in
+Abschnitt~\ref{sec:problemstellung} dargelegten Ausgangslage. Sie belegt, dass
+es sich nicht um ein Einzelfallproblem der Veranstaltungspraxis handelt, sondern
+um eine Eigenschaft des Protokollstandards.
+
+Technisch setzt WiDMX512 auf Transceiver-Module des Typs Texas Instruments
+CC1110 im 915-MHz-ISM-Band bei einer Übertragungsrate von 250\,kbit/s. Da die
+Übertragung eines vollständigen DMX512-Pakets von 512\,Byte bei dieser Datenrate
+31{,}2\,ms beansprucht und damit die im Standard vorgesehene Aktualisierungszeit
+von 22{,}7\,ms überschreitet, teilen die Autoren jedes Frame in zwei Hälften zu
+je 256\,Byte und übertragen diese über zwei parallel betriebene Transceiver auf
+getrennten Kanälen. Empfängerseitig wird das Frame über ein Doppelpufferverfahren
+wieder zusammengesetzt. Oszilloskopmessungen weisen eine Verarbeitungszeit von
+15{,}2\,ms auf der Senderseite und von 22{,}7\,ms bis zum vollständigen Eintreffen
+am Leuchtmittel nach, womit das System die Zeitvorgaben des Standards einhält
+\cite{yang2015real}.
+
+Ein zweiter Beitrag des Systems liegt in seiner bidirektionalen Auslegung.
+Während DMX512 unidirektional arbeitet und der Sender folglich keine Rückmeldung
+darüber erhält, ob ein Gerät korrekt adressiert wurde, quittieren die Slaves in
+WiDMX512 jedes empfangene Paket. Kanal- und Adresszuweisung erfolgen über ein
+Handshake-Verfahren mit bis zu drei Wiederholungen je Anfrage. Für Geräte, die
+außerhalb der Funkreichweite liegen, durch Hindernisse abgeschattet werden oder
+auf einem abweichenden Kanal betrieben werden, schlagen die Autoren eine gemischte
+Topologie vor: Nicht erreichbare Slaves werden über ein Kabel an einen erreichbaren
+Slave angebunden und von diesem als Relais bedient \cite{yang2015real}.
+
+Einen abweichenden Transportweg untersucht Newton, der die Übertragung des
+Art-Net-Protokolls über handelsübliche WLAN-Router im Kontext der
+Beleuchtungssteuerung betrachtet \cite{1554184}. Dieser Ansatz nutzt vorhandene
+Netzwerkinfrastruktur, bindet die Übertragung damit jedoch an den vollständigen
+IEEE-802.11-Stack einschließlich Assoziierung und Access-Point-Verwaltung.
+
+Aus beiden Arbeiten ergeben sich für die vorliegende Arbeit vier Abgrenzungen,
+die weniger als Qualitätsunterschied denn als Folge abweichender Randbedingungen
+zu verstehen sind.
+
+\begin{description}
+  \item[Frequenzbereich] Das von Yang et al. genutzte 915-MHz-Band steht in
+    Europa nicht in gleicher Weise anmeldefreie zur Verfügung wie
+    in Amerika oder in Südkorea, hier ist der Bereich von 863 bis
+    870\,MHz vorgesehen. Der Ansatz ist damit nicht unmittelbar auf den
+    angestrebten Einsatzort übertragbar. Die vorliegende Arbeit nutzt stattdessen
+    das weltweit verfügbare 2,4-GHz-Band
+    (Abschnitt~\ref{subsec:drahtlose-uebertragung}).
+  \item[Datenrate und Redundanz] WiDMX512 muss zwei Transceiver parallel
+    betreiben, um ein einziges DMX-Frame fristgerecht zu übertragen, und verfügt
+    damit über keinerlei Übertragungsreserve. Die deutlich höhere Bruttodatenrate
+    des hier eingesetzten Übertragungsverfahrens erlaubt es hingegen, jeden
+    Datenstand mehrfach zu übertragen. Die in Kapitel~\ref{chap:evaluierung}
+    untersuchte Redundanzstrategie ist folglich keine Notlösung, sondern eine
+    erst durch die Wahl der Übertragungsschicht ermöglichte Entwurfsoption.
+  \item[Quittierung gegenüber Broadcast] Die Bestätigung jedes Pakets verschafft
+    WiDMX512 Zustellsicherheit und eine Rückmeldung über den Konfigurationszustand
+    der Empfänger, erzeugt jedoch einen Aufwand, der mit der Zahl der Empfänger
+    wächst. Die vorliegende Arbeit verzichtet zugunsten einer konstanten
+    One-to-Many-Latenz auf den Rückkanal und kompensiert die fehlende Bestätigung
+    durch mehrfache Aussendung
+    (Abschnitt~\ref{subsec:drahtlose-uebertragung}). Die Adressierung erfolgt
+    nicht über ein Funkprotokoll, sondern lokal am Gerät
+    (Abschnitt~\ref{subsec:benutzerfreundlichkeit}).
+\end{description}
+
+Ergänzend ist anzumerken, dass die Leistungsbewertung in \cite{yang2015real} auf
+den Nachweis der Timing-Konformität beschränkt bleibt. Angaben zu Reichweite,
+Paketverlust oder zum Verhalten unter Fremdfunklast werden nicht erhoben, obwohl
+gerade diese Größen für den Veranstaltungsbetrieb maßgeblich sind. Die in
+Kapitel~\ref{chap:evaluierung} durchgeführten Messreihen setzen an dieser Stelle
+an.
+
+\subsection{Synchronisationskonzepte in verteilten Echtzeitsystemen}
+\label{subsec:forschung-synchronisation}
+
+Werden Lichteffekte auf mehrere räumlich verteilte Geräte aufgeteilt, muss deren
+Ausgabe für den Betrachter gleichzeitig erfolgen. Der klassische Lösungsweg besteht
+darin, die lokalen Uhren der Knoten über ein Synchronisationsprotokoll anzugleichen.
+Elson et al.\ verfolgen mit der \textit{Reference-Broadcast Synchronization} einen
+Ansatz, der für die vorliegende Arbeit unmittelbar aufschlussreich ist: Statt einen
+Zeitstempel vom Sender zum Empfänger zu übertragen, nutzen sie den Umstand, dass ein
+auf der Bitübertragungsschicht ausgesendeter Broadcast von allen Empfängern nahezu
+gleichzeitig registriert wird. Die nichtdeterministischen Verzögerungen auf der
+Senderseite, insbesondere die Wartezeit auf den Kanalzugriff wirken auf alle
+Empfänger gleichermaßen und fallen aus der Betrachtung heraus. Mit handelsüblicher
+802.11-Hardware erreichen die Autoren auf diese Weise eine Übereinstimmung der Uhren
+von 1,85\,µs bei einer Standardabweichung von 1,28\,µs \cite{elson2002}.
+
+Das entwickelte System verzichtet auf ein Synchronisationsprotokoll und nutzt
+stattdessen dieselbe Eigenschaft des Mediums unmittelbar: Alle Röhren empfangen
+denselben Broadcast innerhalb desselben Übertragungsfensters
+(Abschnitt~\ref{subsec:synchronisation-roehem}). Zulässig ist dieser Verzicht, weil die
+hier geforderte Genauigkeit nicht im Mikrosekundenbereich liegt, sondern aus der
+Bewegungswahrnehmungsschwelle folgt und mit rund 42\,ms
+(Abschnitt~\ref{subsec:echtzeitverhalten}) vier Größenordnungen darüber liegt. Die
+Arbeit von Elson et al.\ zeigt damit, dass es sich nicht um eine bloße Vereinfachung
+handelt, sondern um die Nutzung einer dokumentierten Eigenschaft von Broadcast-Medien.
+Nicht gewonnen wird dadurch allerdings eine gemeinsame Zeitbasis zwischen Sender und
+Empfänger, deren Fehlen ist der Grund, weshalb die Ende-zu-Ende-Latenz in dieser Arbeit
+nicht messbar ist (Abschnitt~\ref{sec:grenzen}).
+
+\subsection{Echtzeit-Signalverarbeitung auf Microcontrollern}
+\label{subsec:forschung-signalverarbeitung}
+
+Eine dritte Gruppe von Arbeiten betrifft nicht die Übertragung selbst, sondern die
+Frage, ob der empfangende Mikrocontroller die Daten fristgerecht verarbeiten kann.
+Arm et al.\ untersuchen hierzu das Laufzeitverhalten von FreeRTOS auf einem
+ESP32-WROOM-32 mit Xtensa-Dual-Core-Prozessor und messen unter anderem die Dauer von
+Kontextwechseln sowie den Jitter der Task-Perioden. Ihr zentrales Ergebnis ist, dass
+Kontextwechselzeit und Jitter deutlich ansteigen, sobald die Ausführung eines Tasks auf
+den jeweils anderen Kern verlagert wird \cite{arm2022}.
+
+Für die vorliegende Arbeit folgen daraus zwei Konsequenzen. Erstens ergibt sich die
+Entwurfsvorgabe, zeitkritische Abläufe fest einem Kern zuzuordnen, statt sie zwischen
+den Kernen wandern zu lassen, die in Abschnitt~\ref{subsec:nebenlaeufigkeit}
+beschriebene Aufteilung: Funkstack auf dem Protokollkern, Effektberechnung und
+LED-Ausgabe auf dem Applikationskern, Übergabe über einen überschreibenden Puffer
+setzt genau dies um. Zweitens zeigt die Arbeit, dass Jitter nicht ausschließlich der
+Funkstrecke zuzurechnen ist, sondern auch auf dem Mikrocontroller selbst entsteht. Der
+in Kapitel~\ref{chap:evaluierung} erfasste Jitter enthält diesen Anteil folglich mit
+und ist als Eigenschaft der gesamten Verarbeitungskette zu lesen.
+
+\section{Identifizierte Lücken im Stand der Technik}
+\label{sec:luecken-stand-der-technik}
+
+Die Marktanalyse zeigt eine strukturelle Lücke zwischen funktional umfassenden, 
+jedoch kostenintensiven Premiumsystemen und preisgünstigen, zugleich deutlich 
+reduzierten Alternativen. Während Systeme wie die Astera \textit{Titan Tube} 
+drahtlose Betriebsfähigkeit und kabelgebundene Pixelsteuerung in hoher Integrationsqualität 
+vereinen, sind vergleichbare Funktionsumfänge im unteren Preissegment nicht verfügbar.
+
+Die drahtlose Übertragung von DMX-Steuerdaten ist demgegenüber als Einzelproblem
+wissenschaftlich bereits behandelt worden
+(Abschnitt~\ref{subsec:forschung-kommunikation}). Die Forschungslücke besteht
+folglich nicht darin, dass eine funkgestützte Ansteuerung grundsätzlich
+unerforscht wäre.
+
+Sie liegt vielmehr im Grad der Integration. Die betrachteten Arbeiten ersetzen
+jeweils nur die Übertragungsstrecke zwischen einem Steuergerät und bestehenden
+Beleuchtungsgeräten, während das Leuchtmittel selbst unverändert bleibt und
+weiterhin kabelgebunden versorgt und angesteuert wird. Ein System, das
+Funkempfang und Energieversorgung innerhalb des
+Leuchtmittels vereint und dadurch die Signalverkabelung vollständig entfallen
+lässt, wird in den betrachteten Arbeiten nicht beschrieben. Der Ansatz von Yang
+et al. verdeutlicht diese Grenze besonders, da dort Reichweiten- und
+Abschattungsprobleme durch zusätzliche Kabelverbindungen zwischen den Empfängern
+gelöst werden \cite{yang2015real}.
+
+Hinzu kommt die Frage der Verfügbarkeit: Die kommerziellen Systeme sind
+proprietär, die wissenschaftlichen Arbeiten beschreiben Prototypen ohne
+veröffentlichte Umsetzung. Eine reproduzierbar und transparent dokumentierte
+Open-Source-Lösung, die zugleich an etablierte Steuerungsumgebungen
+anschlussfähig bleibt, ist im betrachteten Anwendungsfeld bislang nicht
+etabliert. Die Neuheit der vorliegenden Arbeit besteht folglich in der
+Entwicklung einer offenen Funkarchitektur, die Übertragung und Leuchtmittel als
+Gesamtsystem begreift.
+

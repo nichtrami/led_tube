@@ -1,0 +1,67 @@
+% Eigenständig kompilierbare Aufgabenstellung.
+% Kompilieren mit XeLaTeX oder LuaLaTeX (wegen fontspec/polyglossia), z. B.:
+%   latexmk -xelatex aufgabenstellung_standalone.tex
+\documentclass[a4paper,11pt]{article}
+
+\usepackage{polyglossia}
+\setdefaultlanguage[spelling=new,babelshorthands=true]{german}
+\usepackage{fontspec}
+\usepackage{parskip}
+\usepackage[left=2.5cm,right=2.5cm,top=2.5cm,bottom=2.5cm]{geometry}
+
+\title{Aufgabenstellung}
+\author{}
+\date{}
+
+\begin{document}
+
+\begin{center}
+  {\Large\bfseries Entwicklung eines funkbasierten Beleuchtungssystems\\
+  auf Basis von LED-Röhren für die Veranstaltungstechnik}\\[0.5em]
+  {\large Aufgabenstellung}
+\end{center}
+
+\bigskip
+
+Der Aufbau professioneller Bühnenbeleuchtung ist durch die kabelgebundene
+DMX-Signalverteilung mit einem erheblichen Planungs-, Verkabelungs- und
+Zeitaufwand verbunden. Kommerzielle Funklösungen adressieren dieses Problem,
+sind jedoch kostenintensiv und primär auf große Produktionen ausgerichtet.
+Ziel dieser Arbeit ist die Entwicklung eines kostengünstigen, funkbasierten
+Beleuchtungssystems auf Basis von LED-Leuchtröhren, das DMX-Steuersignale
+drahtlos an mehrere Beleuchtungseinheiten überträgt und sich ohne Anpassungen
+in bestehende DMX-Infrastrukturen integrieren lässt. Das System soll dabei
+durchgängig als frei zugängliches Open-Source-Projekt konzipiert und
+veröffentlicht werden, um einen niedrigschwelligen Nachbau zu ermöglichen.
+Das System besteht aus einer zentralen \emph{Bridge}, welche Steuerdaten
+entgegennimmt und verteilt, sowie den empfangenden LED-Leuchtröhren, die die
+Daten unmittelbar in Lichtsignale umsetzen.
+
+Im Rahmen der Arbeit sind folgende Teilaufgaben zu bearbeiten:
+
+\begin{itemize}
+  \item Analyse des Einsatzszenarios und Ableitung funktionaler sowie
+        nicht-funktionaler Anforderungen (u.\,a. Echtzeitverhalten,
+        Zuverlässigkeit, Reichweite, Benutzerfreundlichkeit).
+  \item Entwurf einer Systemarchitektur aus Bridge und Leuchtröhren auf Basis
+        des ESP32 mit Definition eines schlanken, drahtlosen
+        Übertragungsprotokolls (ESP-NOW) für die DMX-Datenverteilung.
+  \item Implementierung der Firmware für die Betriebsmodi Einzelbetrieb,
+        autonomer Master-Modus sowie drahtloser DMX-Modus mit Empfang
+        kabelgebundener DMX512-Signale und Weiterleitung an adressierbare Leuchtröhren.
+  \item Umsetzung der Ansteuerung der WS2815-LED-Strips, einer menügeführten
+        Bedienung über OLED-Display und Taster sowie einer persistenten
+        Konfigurationsspeicherung.
+  \item Entwurf der Hardware in Form eigener Platinenlayouts (PCB) sowie der
+        3D-Gehäuse für Bridge und Leuchtröhren unter Berücksichtigung der
+        elektrischen Belastbarkeit und Portabilität.
+  \item Experimentelle Evaluierung des Systems in einer realitätsnahen
+        Umgebung hinsichtlich Verbindungsstabilität, Übertragungsrate, Latenz
+        und Jitter sowie Ableitung verbleibender Optimierungspotenziale.
+\end{itemize}
+
+Sämtliche Ergebnisse -- Software, Platinenlayouts und Gehäusemodelle -- werden
+als Open-Source-Projekt veröffentlicht, um Nachvollziehbarkeit und
+Weiterentwicklung durch Dritte zu ermöglichen.
+
+\end{document}

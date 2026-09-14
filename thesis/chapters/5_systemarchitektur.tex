@@ -1,0 +1,513 @@
+\chapter{Systemarchitektur}
+\label{chap:systemarchitektur}
+
+Basierend auf den im vorherigen Kapitel ermittelten Anforderungen wird im Folgenden die 
+Systemarchitektur des drahtlosen Beleuchtungssystems vorgestellt. 
+Die Architektur beschreibt die grundlegende Struktur des Systems, die ausgewählten 
+Hardwarekomponenten sowie deren Zusammenwirken zur Realisierung der angestrebten Funktionalität. 
+Während dieses Kapitel die konzeptionellen und strukturellen Entscheidungen – insbesondere 
+hinsichtlich der Hardware – aufzeigt, wird die konkrete technische Umsetzung 
+in Kapitel~\ref{chap:implementierung} (Implementierung) behandelt.
+
+\section{Systemüberblick}
+\label{sec:systemueberblick}
+
+Das entworfene System setzt sich aus zwei Hauptkomponenten zusammen: einer zentralen Sendeeinheit (Bridge) und 
+mehreren dezentralen Empfangseinheiten (LED-Leuchtröhren). 
+Die Bridge fungiert als zentraler Kommunikationsknotenpunkt, welcher externe Steuersignale 
+aus der Veranstaltungstechnik – wahlweise über DMX oder Art-Net – entgegennimmt, verarbeitet und in 
+ein systeminternes Protokoll übersetzt. 
+Anschließend verteilt sie die Daten drahtlos an die angeschlossenen Leuchtröhren.
+
+Die LED-Leuchtröhren agieren als verteilte Aktoren. 
+Sie empfangen die von der Bridge ausgesendeten Steuerdaten und setzen diese unmittelbar in Lichtsignale um. 
+Darüber hinaus verfügen sie über einen autarken Standalone-Modus, bei dem keine Verbindung zur Bridge notwendig ist. 
+
+Aus dieser Aufteilung ergeben sich die im Folgenden beschriebenen Strukturen: der
+Signalfluss je Betriebsmodus, die Auswahl der Hardwarekomponenten, die Gliederung der
+Software sowie die Verfahren, mit denen die Daten zwischen den Komponenten übertragen
+und verarbeitet werden.
+
+Abbildung~\ref{fig:systemueberblick} zeigt die Komponenten des Systems und die
+Verbindungen zwischen ihnen.
+
+\begin{figure}[H]
+    \centering
+    \begin{tikzpicture}[node distance=1.1cm and 2.3cm]
+        \node[extern] (pult) {Lichtsteuerung\\(Pult oder Software)};
+        \node[device, right=of pult] (bridge) {\textbf{Bridge}\\ESP32};
+        \node[archbox, right=of bridge, yshift=1.7cm] (t1)
+            {Leuchtröhre 1\\\footnotesize XIAO ESP32-S3 + WS2815};
+        \node[archbox, right=of bridge] (t2)
+            {Leuchtröhre 2\\\footnotesize XIAO ESP32-S3 + WS2815};
+        \node[archbox, right=of bridge, yshift=-1.7cm] (tn)
+            {Leuchtröhre $n$\\\footnotesize XIAO ESP32-S3 + WS2815};
+
+        \draw[link] (pult) -- node[beschr, above] {DMX512\\Art-Net} (bridge);
+        \draw[funk] (bridge) -- (t1);
+        \draw[funk] (bridge) -- node[beschr, above] {ESP-NOW} (t2);
+        \draw[funk] (bridge) -- (tn);
+
+        \node[beschr, below=0.15cm of bridge] {lokales Bedienmenü};
+        \node[beschr, below=0.15cm of tn] {lokales Bedienmenü};
+    \end{tikzpicture}
+    \caption{Systemüberblick: Die Bridge verteilt das kabelgebunden empfangene Steuersignal per Broadcast an alle Leuchtröhren.}
+    \label{fig:systemueberblick}
+\end{figure}
+
+\section{Betriebsmodi und Signalfluss}
+\label{sec:betriebsmodi-signalfluss}
+
+Der Signalfluss im System variiert je nach Betriebsmodus, wobei die grundlegenden Datenpfade und 
+Interaktionen zwischen den Komponenten im Folgenden erläutert werden.
+
+ \subsection{Standalone-Modus (Leuchtröhre)}
+\label{subsec:signalfluss-einzelbetrieb}
+
+Im Standalone-Modus agieren die LED-Leuchtröhren autark, ohne eine Verbindung zur Bridge.
+Die Steuerung erfolgt über die integrierte Benutzeroberfläche der Röhren, bestehend aus 
+einem OLED-Display und Navigationsschaltern.
+Der interne Controller der Röhre generiert die Lichtsignale basierend auf den Benutzereingaben 
+und schickt diese direkt an die LEDs weiter.
+In diesem Modus findet keine Kommunikation mit der Bridge statt, und die Röhren arbeiten unabhängig voneinander.
+
+
+\subsection{DMX-Modus}
+\label{subsec:signalfluss-dmx-betrieb}
+
+Im DMX-Modus empfängt die Bridge die Steuerdaten über die DMX- oder die Art-Net-Schnittstelle, verarbeitet diese und leitet 
+sie drahtlos an die Leuchtröhren weiter.
+Die Bridge fungiert als DMX-zu-ESP-NOW-Gateway: Die DMX-Daten werden in ein internes, an
+DMX angelehntes Protokoll übersetzt und über das integrierte Wi-Fi-Modul an die Röhren
+gesendet.
+Der Controller der Röhre empfängt die Daten über das integrierte Wi-Fi-Modul, validiert diese und setzt sie 
+in die entsprechenden LED-Signale um.
+Die Steuerbefehle pro Röhre enthalten 4 Bytes. 1 Byte für die Wahl eines vordefinierten Effekts und 3 Bytes für die RGB-Farbwerte.
+
+Welche der beiden Eingangsschnittstellen die Bridge auswertet, wird an ihrem Bedienmenü als
+eigener Eintrag der Moduswahl festgelegt: Der DMX-Modus liest das Universum über die
+RS-485-Schnittstelle ein, der Art-Net-Modus über die Ethernet-Schnittstelle. Diese
+Unterscheidung betrifft ausschließlich die Empfangsstufe der Bridge. Ab der Überführung in
+das interne Transportformat sind beide Pfade identisch. Für die Leuchtröhren ist die
+Herkunft des Universums nicht erkennbar, sie verbleiben in beiden Fällen im DMX-Modus.
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.4\textwidth]{images/diagramm_dmx_mode.png}
+	\caption{Signalfluss im DMX-Modus}
+	\label{fig:signalfluss-dmx-betrieb}
+\end{figure}
+
+\section{Hardware-Architektur}
+\label{sec:hardware-architektur}
+
+Die Auswahl der Hardwarekomponenten erfolgte primär unter den Gesichtspunkten der Rechenleistung für 
+Echtzeitverarbeitung, der Verfügbarkeit notwendiger Kommunikationsschnittstellen sowie der räumlichen und 
+energetischen Restriktionen. Als Basis für beide Systemkomponenten wurden Mikrocontroller der ESP32-Familie gewählt. 
+Diese bieten neben einer hohen Taktrate und ausreichend GPIO-Pins vor allem eine integrierte Wi-Fi-Schnittstelle, welche 
+die geforderte drahtlose Vernetzung ohne zusätzliche externe Funkmodule ermöglichen und somit das Systemdesign verschlanken.
+Abbildung~\ref{fig:hardware-architektur} stellt den Aufbau beider Geräte gegenüber.
+
+\begin{figure}[H]
+    \centering
+    \begin{tikzpicture}[x=1cm, y=1cm]
+        % --- Bridge ---
+        \node[archbox, minimum width=3.2cm] (in)   at (0,0)      {DMX512 (RS-485)\\Art-Net (Ethernet)};
+        \node[device,  minimum width=2.8cm] (esp)  at (4.9,0)    {ESP32-32U};
+        \node[archbox, minimum width=2.4cm] (ant1) at (9.2,0)    {externe Antenne};
+        \node[archbox, minimum width=2.8cm] (ui1)  at (4.9,-1.9) {OLED-Display\\+ 3 Taster};
+
+        \draw[link] (in)  -- (esp);
+        \draw[link] (esp) -- (ant1);
+        \draw[link, {Latex[length=2mm]}-{Latex[length=2mm]}] (esp) -- (ui1);
+        \node[beschr, right=0.25cm of ui1] {Versorgung: 5\,V über USB-C};
+
+        \begin{scope}[on background layer]
+            \node[huelle, fit=(in)(esp)(ant1)(ui1),
+                  label={[font=\small\bfseries]above:Bridge}] {};
+        \end{scope}
+
+        % --- Leuchtröhre ---
+        \node[archbox, minimum width=3.2cm] (strip) at (0,-5.2)   {WS2815-Strip\\\footnotesize 120 Pixel};
+        \node[device,  minimum width=2.8cm] (xiao)  at (4.9,-5.2) {XIAO ESP32-S3};
+        \node[archbox, minimum width=2.4cm] (ant2)  at (9.2,-5.2) {externe Antenne};
+        \node[extern,  minimum width=3.2cm] (pwr2)  at (0,-7.3)   {12\,V-Netzteil};
+        \node[archbox, minimum width=2.8cm] (buck)  at (4.9,-7.3) {Step-Down\\\footnotesize 12\,V $\rightarrow$ 5\,V};
+        \node[archbox, minimum width=2.4cm] (ui2)   at (9.2,-7.3) {OLED-Display\\+ 3 Taster};
+
+        \draw[link] (xiao) -- (strip);
+        \draw[link] (ant2) -- (xiao);
+        \draw[link] (pwr2) -- (strip);
+        \draw[link] (pwr2) -- (buck);
+        \draw[link] (buck) -- (xiao);
+        \draw[link, {Latex[length=2mm]}-{Latex[length=2mm]}] (ui2) -- (xiao);
+
+        \begin{scope}[on background layer]
+            \node[huelle, fit=(strip)(xiao)(ant2)(pwr2)(buck)(ui2),
+                  label={[font=\small\bfseries]above:Leuchtröhre}] {};
+        \end{scope}
+
+        \draw[funk] (ant1) -- node[beschr, right=1mm, pos=0.62] {ESP-NOW} (ant2);
+    \end{tikzpicture}
+    \caption{Hardware-Architektur beider Gerätetypen: gemeinsame Bedienhardware und gemeinsamer Funkweg, unterschiedliche Schnittstellen.}
+    \label{fig:hardware-architektur}
+\end{figure}
+
+\subsection{Bridge}
+\label{subsec:bridge-hardware}
+
+Die Bridge übernimmt die Aufgabe der Protokollkonvertierung und Datenverteilung. 
+Als zentrale Steuereinheit kommt ein ESP32-32U Entwicklungsboard zum Einsatz. Dieser Mikrocontroller bietet 
+die entsprechende Rechenleistung um die Echtzeitverarbeitung der eingehenden DMX- und Art-Net-Datenströme zu gewährleisten, 
+und verfügt über ausreichend GPIOs für die Anbindung der notwendigen Peripherie.
+
+Zur physikalischen Integration in die bestehende Infrastruktur ist die Bridge mit dedizierten Schnittstellen ausgestattet. 
+Für den DMX-Empfang wird ein RS-485-Transceiver (SN75176) verwendet, der als Pegelwandler zwischen den 
+differenziellen DMX-Signalen nach RS-485-Standard und den TTL-Signalen des ESP32 agiert. 
+Für den Art-Net-Betriebsmodus ist ein Ethernet-Modul vom Typ USR-ES1 integriert, welches den physikalischen 
+Netzwerkzugriff für den Art-Net-Empfang gewährleistet.
+
+Die Weiterleitung der verarbeiteten Steuerdaten an die Leuchtröhren erfolgt über das integrierte 
+Wi-Fi-Modul des ESP32. Zur Erhöhung der Reichweite und Kommunikationsstabilität im störanfälligen Bühnenumfeld ist 
+eine externe Antenne vorgesehen.
+
+Die primäre Spannungsversorgung der Bridge-Komponenten erfolgt per 5V-USB-C-Anschluss direkt über das ESP32-Development-Board. 
+Zur Erfüllung der Anforderungen bezüglich Systemkonfiguration und Benutzerfreundlichkeit verfügt das Bedienpanel über 
+ein monochromes OLED-Display sowie drei Taster für die Menüführung. 
+Es wurde exakt dieselbe Hardwarekombination wie bei der Röhre gewählt, um die Handhabung 
+intuitiv und komponentenübergreifend einheitlich zu gestalten.
+
+\subsection{LED-Leuchtröhren}
+\label{subsec:led-leuchtroehren-hardware}
+
+Die LED-Leuchtröhren unterliegen baulichen Beschränkungen aufgrund des schlanken Formfaktors bei einem Außendurchmesser von 40\,mm. 
+Aus diesem Grund wurde für die Steuerung der \textit{XIAO ESP32-S3} Mikrocontroller ausgewählt. 
+Dieser zeichnet sich durch einen besonders kleinen Formfaktor bei ausreichend verfügbaren GPIO-Pins 
+und einem dedizierten Anschluss für eine externe WLAN-Antenne aus.
+
+Als Leuchtmittel werden LED-Streifen des Typs WS2815 mit einer Dichte von 60 LEDs pro Meter verwendet. 
+Der WS2815 teilt dasselbe Kommunikationsprotokoll wie der weitverbreitete WS2812B (5V-TTL-Logikpegel), 
+verfügt jedoch über einen integrierten Spannungsregler und wird mit einer Arbeitsspannung von 12V betrieben. 
+Die Anhebung der Betriebsspannung verringert den Spannungsabfall bei längeren Kabel- und
+Streckenführungen. Zudem müssen die verwendeten Komponenten nur auf geringere
+Stromstärken ausgelegt werden.
+
+Der zusätzliche schaltungstechnische Aufwand zur Erzeugung der Betriebsspannung von 5V (für die restliche Elektronik) wird 
+durch die Vorteile der 12V-LED-Architektur kompensiert. 
+Zur Realisierung kommt ein kompakter DC-DC-Step-Down-Wandler zum Einsatz, der die von einem externen 12V-Netzteil 
+bezogene Eingangsspannung auf 5V reduziert. 
+Da der XIAO ESP32-S3 über einen eigenen On-Board-Spannungsregler verfügt, kann das 5V-Niveau direkt 
+an dessen VCC-Eingangspin anliegen. 
+Dieser transformiert die anliegende Spannung weiter auf die nominelle Chipspannung von 3,3V.
+
+Für die Kommunikation kommen bei den Röhren die reziproken Gegenstücke der Bridge-Sender zum Einsatz: 
+Das drahtlose Signal wird über die Wi-Fi-Schnittstelle des ESP32-S3 (mit externer Antenne) demoduliert.
+
+Wie beim Steuergerät umfasst das Human-Machine-Interface auch hier ein monochromes OLED-Display 
+sowie drei Navigationsschalter. 
+Die konkreten Pinzuteilungen, Schaltungsdetails und Platinenentwürfe der Baugruppen
+werden in Kapitel~\ref{chap:implementierung} erläutert.
+
+\section{Software-Architektur}
+\label{sec:software-architektur}
+
+Das Software-Design des Systems folgt einem modularen und objektorientierten Ansatz. 
+Ein zentraler Aspekt der Architektur ist die Verwendung derselben Codebasis für beide 
+Geräteklassen (Bridge und Leuchtröhre). Durch bedingte Kompilierung wird mittels Umgebungsvariablen je nach 
+Zielsystem entschieden, welche Logikblöcke eingebunden werden, was Redundanzen vermeidet und 
+die Wartbarkeit erhöht.
+Abbildung~\ref{fig:software-architektur} zeigt die resultierende Gliederung.
+
+\begin{figure}[H]
+    \centering
+    \begin{tikzpicture}[x=1cm, y=1cm]
+        \node[device, text width=4.7cm, align=center] (bfw) at (0,0)
+            {\textbf{Bridge-Firmware}\\[2pt]\footnotesize DMX- und Art-Net-Eingang,
+             Effektgenerierung im Master-Modus, Adressvergabe};
+        \node[device, text width=4.7cm, align=center] (tfw) at (6.4,0)
+            {\textbf{Leuchtröhren-Firmware}\\[2pt]\footnotesize Funkempfang, Auswertung
+             der eigenen Adresse, Rendering};
+
+        \node[modul] (m1) at (-1.3,-2.9) {Menü und Display};
+        \node[modul] (m2) at (3.2,-2.9)  {Drahtlose Kommunikation};
+        \node[modul] (m3) at (7.7,-2.9)  {LED-Steuerung};
+
+        \begin{scope}[on background layer]
+            \node[huelle, fit=(m1)(m2)(m3),
+                  label={[font=\small\bfseries]below:Gemeinsame Module}] (hull) {};
+        \end{scope}
+
+        \draw[link] (bfw.south) -- (hull.north -| bfw.south);
+        \draw[link] (tfw.south) -- (hull.north -| tfw.south);
+    \end{tikzpicture}
+    \caption{Gliederung der Software: gemeinsame Hardwareabstraktion, zur Übersetzungszeit ausgewählte gerätespezifische Firmware.}
+    \label{fig:software-architektur}
+\end{figure}
+
+\subsection{Modulare Struktur und geteilte Komponenten}
+\label{subsec:gemeinsame-softwarekomponenten}
+
+Um die Kernfunktionen abzubilden, ist die Software in funktional getrennte Module unterteilt, 
+die geräteübergreifend grundlegende Aufgaben zur Hardwareabstraktion übernehmen:
+
+\begin{itemize}
+    \item \textbf{Benutzerinteraktion (Menü und Display):} Kapselt die Verwaltung lokaler 
+    Einstellungen, sichert Konfigurationen persistent und visualisiert Systemparameter für den Nutzer.
+    \item \textbf{Drahtlose Kommunikation:} Stellt eine generische Abstraktionsschicht 
+    für das Senden und Empfangen der systeminternen Datenpakete über das Funknetzwerk bereit.
+    \item \textbf{Lichterzeugung (LED-Controller):} Übernimmt die logische Übersetzung von 
+    rohen Datenwerten (Farben, Parameter oder Pixelarrays) in dynamische Lichtsignale
+\end{itemize}
+
+Ein übergeordneter Steuerungsprozess orchestriert diese Module, aktualisiert das System und 
+etabliert – abhängig vom aktuellen Betriebsmodus – den direkten Datenfluss zwischen Peripherie 
+und Aktoren.
+
+\subsection{Gerätespezifische Firmware-Profile}
+\label{subsec:geraetespezifische-firmware}
+
+Aufbauend auf den gemeinsamen Modulen fokussieren sich Bridge und Leuchtröhre jeweils auf 
+ihre dedizierten Aufgaben innerhalb der Systemtopologie:
+
+\textbf{Bridge-Firmware:} \\
+Die Software der Bridge agiert primär als Gateway. Sie initiiert 
+zusätzliche spezialisierte Komponenten zum Einlesen und Verarbeiten externer Protokolle 
+(DMX und Art-Net). Um Latenzen im Netzwerkverkehr zu minimieren, trennt das Architekturdesign 
+Protokoll-Parsing vom regulären Ausgabezyklus. 
+Dies ermöglicht das parallele Verarbeiten von eingehenden Datenströmen, während die Ausgabe 
+an die Röhren kontinuierlich und ohne Unterbrechungen erfolgt.
+Anschließend werden die aufbereiteten Datenpakete für die drahtlose Verteilung
+bereitgestellt.
+
+\textbf{Leuchtröhren-Firmware:} \\
+Das Profil der Leuchtröhren zeichnet sich durch einen reaktiven, schlanken Ausführungszyklus 
+aus, um Framedrops zu vermeiden und Latenzen zu minimieren:
+
+\begin{itemize}
+    \item \textbf{Autarker Betrieb:} Die Lichtsignalerzeugung agiert komplett losgelöst und speist 
+    aktuelle User-Inputs in die eigene Lichtdarstellung ein.
+    \item \textbf{Drahtloser Empfang:} Das System fragt fortlaufend den aktuellen Daten-Payload 
+    für die eigene Geräteadresse aus der Funkschnittstelle ab und projiziert identifizierte Werte 
+    umgehend auf die Pixel.
+\end{itemize}
+
+\section{Übertragungstechnologien und Protokolle}
+\label{sec:uebertragungstechnologien}
+
+Während Abschnitt~\ref{sec:datenfluss-und-signalverarbeitung} den inneren Signalablauf 
+der Softwaremodule beschreibt, definiert dieser Abschnitt die netzwerktechnischen Konzepte und 
+verwendeten Protokolle, um die Brücke zwischen den physikalischen Schnittstellen und 
+den Software-Logikblöcken zu schließen.
+
+\subsection{Drahtlose Übertragung über ESP-NOW}
+\label{subsec:drahtlose-uebertragung}
+
+Für die drahtlose Kommunikation wurde das herstellerspezifische
+\textit{ESP-NOW}-Protokoll von Espressif gewählt. Seine technischen Eigenschaften sind in
+Abschnitt~\ref{subsec:espnow-protokoll} beschrieben. Ausschlaggebend waren zwei
+Eigenschaften, die unmittelbar auf die Anforderungen an Latenz und Stabilität einzahlen.
+
+Erstens arbeitet das Protokoll verbindungslos. Damit entfallen nicht nur die
+zeitaufwändigen Assoziierungsvorgänge eines Access-Point-Client-Modells, sondern auch die
+Verbindungszustände, die im laufenden Betrieb verloren gehen und wiederhergestellt werden
+müssten. Das System benötigt keine Netzwerkinfrastruktur und kann folglich auch nicht
+durch deren Ausfall beeinträchtigt werden.
+
+Zweitens adressiert die Bridge sämtliche Röhren über eine gemeinsame Broadcast-Adresse.
+Der Sendeaufwand ist dadurch unabhängig von der Anzahl der Empfänger, und alle Röhren
+erhalten denselben Datenstand innerhalb desselben Übertragungsfensters, was die
+Voraussetzung für die in Abschnitt~\ref{subsec:synchronisation-roehem} beschriebene
+Synchronisation ohne eigenes Zeitprotokoll. Der Broadcast-Betrieb kennt allerdings keine
+Empfangsbestätigung. Die fehlende Zustellgarantie wird deshalb dadurch ausgeglichen, dass
+die Bridge denselben Lichtzustand fortlaufend erneut aussendet: Geht eine Aussendung
+verloren, trägt die nächste denselben Wert. Wie wirksam dieses Verfahren ist, untersucht
+Kapitel~\ref{chap:evaluierung}.
+
+\subsection{Kabelgebundene Schnittstellen}
+\label{subsec:kabelgebundene-uebertragung}
+
+Die Anbindung an die vorhandene Infrastruktur, Lichtpulte und Steuerungssoftware
+erfolgt über DMX512 als primäres Eingangsprotokoll
+(Abschnitt~\ref{subsec:dmx512}). Die Architektur nutzt dabei die Robustheit der
+differentiellen RS-485-Übertragung, um die Signale störungssicher einzulesen, bevor sie
+in das interne Format überführt werden. Damit fügt sich die Bridge ohne Anpassungen in
+bestehende DMX-Strecken ein und erscheint dem Lichtpult als gewöhnliches Endgerät.
+
+Alternativ nimmt die Bridge dieselben Steuerdaten über Art-Net entgegen
+(Abschnitt~\ref{subsec:artnet}). Art-Net dient dabei ausschließlich als
+Transportweg für ein DMX-Universum über eine Ethernet-Verbindung. Die Daten sind
+inhaltlich identisch zu den über RS-485 empfangenen und durchlaufen ab der
+Normalisierung denselben Verarbeitungspfad. Da die Bridge jedoch stets nur eine der beiden
+Schnittstellen auswertet, ist die Wahl der Quelle als eigener Eintrag der Moduswahl
+ausgeführt. Am Verhalten der Leuchtröhren und am weiteren Verarbeitungspfad ändert sich
+dadurch nichts.
+
+\subsection{Protokoll-Abstraktion (Internes Datenformat)}
+\label{subsec:internes-protokoll}
+
+Um die unterschiedlichen externen Eingabemethoden (lokales UI, DMX, Art-Net) zu harmonisieren, überführt die Systemarchitektur 
+jegliche Eingaben stets in normierte interne Datenstrukturen (Data Transfer Objects), noch bevor sie verarbeitet oder weitergeleitet werden. 
+Das Konzept zielt darauf ab, die physikalische Übertragungsebene von der darstellenden LED-Logik vollständig zu entkoppeln.
+Durch die Kapselung in einen Transport-Frame, welcher stets eine Metainformation über die Startadresse mitführt, 
+lassen sich DMX-Universen gezielt in kleinere Segmente fragmentieren. 
+Dadurch muss nicht das gesamte Universum über die Bandbreiten-limitierte Funkschnittstelle übertragen werden, 
+sondern lediglich jener Payload-Sektor, den die adressierten Röhren tatsächlich verarbeiten.
+
+\section{Datenfluss und Signalverarbeitung}
+\label{sec:datenfluss-und-signalverarbeitung}
+
+Die Verarbeitung der Steuerdaten folgt unterschiedlichen Pfaden je nach Betriebsmodus. 
+In diesem Abschnitt werden die End-to-End-Datenpfade, die Latenzcharakteristiken und die 
+Synchronisationsmechanismen beschrieben.
+
+\subsection{End-to-End-Datenpfade}
+\label{subsec:end-to-end-datenpfade}
+
+Der Datenfluss im System lässt sich entsprechend der Betriebsmodi in unterschiedliche Kanäle unterteilen:
+
+\subsubsection{Bridge -- Master-Modus}
+
+Im Master-Modus erzeugt die Bridge den Lichtzustand selbst. Aus den am Bedienmenü
+gewählten Parametern entsteht fortlaufend ein Steuerdatensatz, der in das interne
+Transportformat gekapselt und per Broadcast an alle Röhren verteilt wird. Die Röhren
+werten den für sie bestimmten Abschnitt aus und setzen ihn unmittelbar in Licht um. Ein
+externes Steuersignal ist an keiner Stelle des Pfades beteiligt.
+
+\subsubsection{Bridge -- DMX-Modus}
+
+Im DMX-Modus fungiert die Bridge als Gateway zwischen DMX-Strecke und Funkverbindung. Das
+eingehende Universum wird über die RS-485-Schnittstelle empfangen, vollständig gepuffert
+und anschließend auf denjenigen Adressbereich reduziert, den die angesteuerten Röhren
+tatsächlich auswerten. Die Größe des übertragenen Pakets wächst dabei linear mit der
+Anzahl der Röhren, da je Röhre vier Steuerbytes vorgesehen sind. Jede Röhre entnimmt dem
+Broadcast den ihrer Startadresse zugeordneten Abschnitt.
+
+\subsubsection{Leuchtröhre -- Standalone-Modus}
+
+Ohne Verbindung zur Bridge erzeugt die Röhre den Lichtzustand aus den lokal gewählten
+Parametern. Der Datenpfad verläuft vollständig innerhalb des Geräts, von der
+Menüeingabe über die Lichterzeugung bis zur Ansteuerung des LED-Strips.
+
+\subsubsection{Leuchtröhre -- DMX-Modus}
+
+Im DMX-Modus ist der Empfang bewusst vom Ausgabezyklus entkoppelt: Eingehende Funkpakete
+werden asynchron entgegengenommen und zwischengespeichert, während die Lichterzeugung
+den jeweils aktuellen Pufferinhalt zyklisch ausliest. Diese Trennung stellt sicher, dass
+der Empfang die Ausgabe nicht blockiert und umgekehrt keine Pakete verloren gehen, die
+zwischen zwei Ausgabezyklen eintreffen.
+
+\subsection{Datenpaketformate}
+\label{subsec:datenpaketformate}
+
+Auf Architekturebene werden zwei Datenkonzepte unterschieden, deren konkrete
+speichertechnische Repräsentation Kapitel~\ref{chap:implementierung} beschreibt. Der
+Steuerungsdatensatz fasst die Parameter einer einzelnen Röhre zusammen und ist damit die
+kleinste adressierbare Einheit. Er wird im Master-Modus wie im DMX-Modus verwendet. Das
+Transportformat kapselt eine Folge solcher Datensätze für die drahtlose Übertragung und
+führt dabei die Startadresse des übertragenen Ausschnitts mit. Erst diese
+Metainformation erlaubt es, statt des vollständigen Universums nur den tatsächlich
+benötigten Ausschnitt zu übertragen.
+
+\subsection{Latenzcharakteristiken}
+\label{subsec:latenzcharakteristiken}
+
+Die Systemlatenz von der Signaleingabe zur Lichtausgabe wird durch die Summierung 
+folgender Teilschritte definiert:
+
+\subsubsection{Bridge-Seite}
+
+\begin{itemize}
+    \item \textbf{Signal-Empfang und Decodierung:} Zeitaufwand für das physikalische Einlesen 
+    des externen Protokolls (abhängig von der Bus-Baudrate des DMX- oder Netzwerk-Art-Net-Signals).
+    \item \textbf{Pufferung und Datenformatierung:} Interne Verarbeitungszeit zur Konvertierung in das Systemprotokoll.
+    \item \textbf{Funkübertragung:} Die Ausbreitungs- und Übertragungszeit über den drahtlosen Kanal zur Röhre.
+\end{itemize}
+
+\subsubsection{Röhren-Seite}
+
+\begin{itemize}
+    \item \textbf{Funksignal-Empfang:} Zeit für die Signalerkennung und Bereitstellung im Speicher.
+    \item \textbf{Daten-Abfrage:} Dauer bis zur zyklischen Verarbeitung der bereitgestellten Daten durch die Lichterzeugungslogik.
+    \item \textbf{LED-Refresh:} Dauer zur physikalischen Ansteuerung der LED-Hardware.
+\end{itemize}
+
+Das Systemarchitektur-Design stellt sicher, dass die Anforderungen an reaktive Beleuchtung 
+(Abschnitt~\ref{subsec:echtzeitverhalten}) prinzipiell erfüllt werden können. 
+Konkrete Implementierungsdetails und gemessene Zeiten sind Kapitel~\ref{chap:implementierung} 
+und \ref{chap:evaluierung} zu entnehmen.
+
+\subsection{Pufferstrategie und Datenaktualisierung}
+\label{subsec:pufferstrategie}
+
+Für die drahtlose Übertragung gilt eine Overwrite-Strategie nach dem Prinzip
+\textit{Latest Data Only}: Ein eintreffendes Paket überschreibt den vorhandenen
+Pufferinhalt unmittelbar, ohne dass ältere Stände aufbewahrt werden. Für Steuerdaten
+einer Beleuchtung ist dies die angemessene Wahl, denn ein überholter Lichtzustand hat
+keinen Wert mehr, sobald ein neuerer vorliegt. Die Entscheidung hat zwei Folgen, die
+unmittelbar auf die Anforderungen einzahlen: Zu jedem Ausgabezyklus liegt stets der
+aktuellste verfügbare Wert an, und ein verlorenes Paket führt nicht zu einem Ausfall,
+sondern lediglich dazu, dass der zuletzt empfangene Zustand länger gehalten wird. Das in
+Abschnitt~\ref{subsec:zuverlaessigkeit} geforderte definierte Verhalten bei
+Verbindungsverlust ergibt sich damit unmittelbar aus der Pufferstrategie und erfordert
+keine gesonderte Fehlerbehandlung.
+
+Auf der Eingangsseite der Bridge werden dagegen vollständige Universen gepuffert, da ein
+DMX-Frame erst nach seinem Ende vollständig ausgewertet werden kann. Eingehende Frames
+werden strukturell geprüft, bevor der für die Röhren relevante Adressbereich entnommen
+wird. Der Empfang über Art-Net ist vom Ausgabezyklus entkoppelt: Netzwerkpakete werden
+asynchron entgegengenommen und zwischengespeichert, sodass sie dem Ausgabetakt ohne
+zusätzlichen Jitter zur Verfügung stehen.
+
+\subsection{Synchronisation mehrerer Röhren}
+\label{subsec:synchronisation-roehem}
+
+Um eine gleichzeitige Lichtausgabe bei verteilten Röhren zu gewährleisten, kombiniert 
+die Architektur folgende Ansätze, anstatt auf aufwändige Zeitsynchronisationsprotokolle zurückzugreifen:
+
+\begin{itemize}
+    \item \textbf{Broadcast-Verteilung:} Dieser Ansatz übernimmt den Grundgedanken der DMX-Topologie.
+    Das Leitsignal wird simultan an alle Empfangsknoten gesendet, 
+    sodass die logische Anweisung an allen Röhren innerhalb desselben Übertragungsfensters am Receiver anliegt.
+    
+    \item \textbf{Logische Adressierungsschemata:} Die Broadcast-Frames bündeln die Informationen für mehrere Geräte. 
+    Jedes Endgerät extrahiert über eine feste Adresszuweisung nur den für sich relevanten Datenblock.
+    
+    \item \textbf{Dezentrale Autonomie:} Lokal arbeiten die Geräte asynchron mit eigenen Refresh-Zyklen. 
+    Die Ausführungsintervalle sind hierbei jedoch so kurz gewählt, dass visuelle Laufzeitunterschiede 
+    zwischen Knotenpunkten weit unterhalb der physiologischen menschlichen Wahrnehmungsschwelle für Bewegungen (24 Hz also ca. 42 ms) bleiben \cite{fujii2018,ramunae2025}.
+\end{itemize}
+
+Diese Architektur ermöglicht eine dezentrale, eventgesteuerte Verarbeitung ohne zusätzliche Synchronisationsprotokolle 
+und behält damit Einfachheit und Zuverlässigkeit bei.
+
+\section{Konfiguration und Bedienkonzept}
+\label{sec:konfiguration-und-bedienkonzept}
+
+Bridge und Leuchtröhren werden ausschließlich am Gerät konfiguriert, ohne zusätzliche
+Software und ohne Netzwerkzugang. Beide Gerätetypen verwenden dafür dasselbe
+Bedienkonzept und dieselbe Kombination aus monochromem OLED-Display und drei Tastern,
+sodass sich die Bedienung nicht unterscheidet, gleich welches Gerät der Anwender vor sich
+hat. Die Navigation ist zweistufig aufgebaut: Die erste Ebene führt durch die verfügbaren
+Parameter, die zweite dient deren Bearbeitung. Die konkrete Umsetzung einschließlich
+Eingabeerfassung, Anzeige und Speicherung beschreibt
+Abschnitt~\ref{subsec:menu}.
+
+Architektonisch bedeutsam ist, dass der Parametersatz nicht fest vorgegeben ist, sondern
+vom aktiven Betriebsmodus abhängt. Angezeigt werden ausschließlich die im jeweiligen
+Modus wirksamen Einstellungen, was die Bedienung auf das Notwendige reduziert. Die
+Moduswahl selbst ist davon ausgenommen und bleibt stets erreichbar. Daraus ergeben sich
+die folgenden Parametersätze:
+
+\begin{itemize}
+    \item \textbf{Standalone-Modus (Leuchtröhre):} Effektauswahl und Farbwahl.
+    \item \textbf{Master-Modus (Bridge):} Effektauswahl, Farbwahl, Anzahl der
+          angesteuerten Leuchtröhren sowie Funkkanal.
+    \item \textbf{DMX-Modus:} DMX-Startadresse der Leuchtröhre sowie Funkkanal.
+    \item \textbf{Art-Net-Betrieb:} zusätzlich die Netzwerkkonfiguration der Bridge
+          (IP-Adresse, DHCP-Aktivierung sowie Art-Net-Netz, Subnetz und Universum).
+\end{itemize}
+
+Sämtliche Werte werden persistent im nichtflüchtigen Speicher des Mikrocontrollers
+abgelegt und beim Systemstart automatisch geladen. Die Geräte sind damit nach einer
+Spannungsunterbrechung ohne erneute Konfiguration betriebsbereit, eine Anforderung, die
+sich unmittelbar aus dem Veranstaltungsbetrieb ergibt
+(Abschnitt~\ref{subsec:benutzerfreundlichkeit}).

@@ -1,0 +1,29 @@
+.pio
+.vscode/
+.idea/
+pcb/wired_tube_input_pcb/
+pcb/wired_tube_output_pcb/
+pcb/_deprecated_design/
+body/
+# pcb/
+*.zip
+/thesis/praesentation/
+**/.DS_Store
+
+**/.venv/
+**/__pycache__/
+*.pyc
+
+# Arbeitsunterlagen: Hersteller-Datenblaetter (urheberrechtlich geschuetzt),
+# interne Preiskalkulation und Schaltplan-Entwuerfe.
+# Bleiben lokal verfuegbar, werden aber nicht veroeffentlicht.
+documents/
+
+# LaTeX-Artefakt eines fehlgeschlagenen biber-Laufs
+thesis/*.bbl-SAVE-ERROR
+
+
+# test_programs/results/analysis/figures/*.pdf
+# test_programs/results/analysis/tables/*.tex
+# test_programs/results/analysis/tables/*.csv
+

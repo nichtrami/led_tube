@@ -1,0 +1,102 @@
+\documentclass[a4paper,10pt]{report}
+
+\usepackage{graphicx}
+\usepackage{subcaption}
+\usepackage{booktabs}
+\usepackage{polyglossia}
+\setdefaultlanguage[spelling=new,babelshorthands=true]{german}
+\usepackage{fontspec}
+\usepackage{parskip}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage[backend=biber,style=numeric,babel=other]{biblatex}
+\addbibresource{literatur.bib}
+\usepackage[hidelinks]{hyperref}
+\usepackage[left=2cm,right=2cm,top=3.0cm,bottom=3.0cm]{geometry}
+\usepackage[arrow, matrix, curve]{xy}
+\usepackage{msc}
+\usepackage{float}
+\usepackage{xcolor}
+\usepackage[edges]{forest}
+\usepackage{tikz}
+\usetikzlibrary{positioning, arrows.meta, fit, backgrounds, decorations.pathreplacing}
+\tikzset{
+    archbox/.style   = {draw, rounded corners=2pt, align=center, inner sep=5pt,
+                        minimum height=1.05cm, font=\small},
+    extern/.style    = {archbox, fill=black!5},
+    device/.style    = {archbox, fill=black!12, thick},
+    modul/.style     = {archbox, fill=black!3, minimum width=3.3cm},
+    huelle/.style    = {draw, dashed, rounded corners=4pt, inner sep=9pt},
+    link/.style      = {-{Latex[length=2.2mm]}, thick},
+    funk/.style      = {link, dashed},
+    beschr/.style    = {font=\footnotesize, align=center, inner sep=2pt}
+}
+\usepackage{listings}
+\lstset{
+    language=Python,
+    basicstyle=\ttfamily\small,
+    keywordstyle=\color{purple}\bfseries,
+    commentstyle=\color{gray}\itshape,
+    stringstyle=\color{teal},
+    numberstyle=\tiny\color{gray!60},
+    identifierstyle=\color{black},
+    backgroundcolor=\color{gray!5},
+    frame=single,
+    frameround=tttt,
+    framerule=0.5pt,
+    framexleftmargin=5pt,
+    breaklines=true,
+    showstringspaces=false,
+    numbers=left,
+    numbersep=10pt,
+    tabsize=4,
+    captionpos=b,
+    xleftmargin=10pt,
+    xrightmargin=5pt,
+    emphstyle=\color{blue!80!black},
+    emph={def,class,import,from,as,return,if,elif,else,for,while,try,except,with}
+}
+%\usepackage{draftwatermark}
+%\SetWatermarkText{Entwurf}
+%\nofiles
+
+\begin{document}
+
+% Deckblatt
+\input{title}
+
+%Abstract
+\newpage
+\input{abstract}
+
+% Inhaltsverzeichnis
+\setcounter{page}{1}
+\pagenumbering{arabic}
+\tableofcontents
+
+%Leere Seite
+\newpage
+\null
+\newpage
+
+% Kapitel einbinden
+\include{chapters/1_einleitung}
+\include{chapters/2_grundlagen}
+\include{chapters/3_stand_der_technik}
+\include{chapters/4_anforderungsanalyse}
+\include{chapters/5_systemarchitektur}
+\include{chapters/6_implementierung}
+\include{chapters/7_evaluierung}
+\include{chapters/8_diskussion}
+
+% Anhang
+\appendix
+\include{chapters/anhang}
+
+% Literaturverzeichnis
+\printbibliography
+
+% Eigenständigkeitserklärung
+\include{eigenstaendigkeitserklaerung}
+
+\end{document}

@@ -1,0 +1,348 @@
+\chapter{Theoretische Grundlagen}
+\label{chap:grundlagen}
+
+\section{Eingebettete Systeme}
+\label{sec:eingebettete-systeme}
+
+Eingebettete Systeme werden von Marwedel als informationsverarbeitende Systeme 
+definiert, die in in ein umgebendes Produkt eingebettet sind und dort dedizierte 
+Steuerungs-, Regelungs- oder Überwachungsaufgaben übernehmen \cite{marwedel2021}. 
+Im Gegensatz zu universellen Computersystemen sind sie auf einen konkreten 
+Anwendungsfall zugeschnitten. Als gemeinsame Merkmale dieser Systemklasse nennt 
+Marwedel insbesondere Echtzeitanforderungen sowie Anforderungen an Verlässlichkeit 
+und Effizienz \cite{marwedel2021}, letztere äußert sich in ressourcensparender 
+Hardware und häufig energiesparenden Betriebsweisen.
+
+Die zunehmende Miniaturisierung und Leistungsfähigkeit moderner Mikrocontroller hat in 
+den vergangenen Jahren zu einer breiten Durchdringung eingebetteter Systeme in 
+unterschiedlichen Domänen geführt. Insbesondere die 
+Integration drahtloser Kommunikationsschnittstellen wie WLAN und Bluetooth in 
+kostengünstige Mikrocontroller-Plattformen eröffnet neue Möglichkeiten für verteilte, 
+vernetzte Systemarchitekturen.
+
+Im Kontext des entwickelten LED-Tube-Systems bilden eingebettete Systeme die zentrale 
+Komponente sowohl der Bridge als auch der einzelnen Tubes. Beide setzen auf den 
+ESP32-Mikrocontroller, der im Folgenden näher betrachtet wird.
+
+\subsection{ESP32-Mikrocontroller}
+\label{subsec:esp32}
+
+Die Bezeichnung ESP32 steht nicht für einen einzelnen Chip, sondern für eine von 
+Espressif Systems entwickelte Familie von System-on-Chips (SoC), deren Mitglieder sich 
+in Prozessorarchitektur, Speicherausstattung und Peripherie unterscheiden 
+\cite{espressif_esp32}. Kennzeichnend für die gesamte Familie ist die Integration eines 
+leistungsfähigen Prozessors und umfangreicher drahtloser Kommunikationsschnittstellen 
+(WLAN 802.11 b/g/n sowie Bluetooth beziehungsweise Bluetooth Low Energy) auf einem 
+einzigen Baustein. Das namensgebende erste Mitglied der Familie kombiniert dabei einen 
+Dual-Core-Prozessor des Typs Xtensa LX6 mit WLAN und Bluetooth 4.2. Seit der Einführung 
+im Jahr 2016 hat sich die ESP32-Reihe zu einer der meistverwendeten Plattformen im 
+Bereich des Internet of Things (IoT) und eingebetteter Systeme entwickelt. Besonders die 
+Kompatibilität mit dem im Hobby- und Maker-Bereich weit verbreiteten Arduino-Ökosystem 
+sowie die umfassende Unterstützung durch die Entwicklergemeinschaft haben zur 
+Popularität des ESP32 beigetragen.
+
+\subsubsection{Technische Merkmale}
+\label{subsubsec:esp32-merkmale}
+
+Es existieren verschiedene Varianten des ESP32, die sich in Bezug auf Speicherkapazität, Anzahl der GPIO-Pins,
+integrierte Peripheriefunktionen und unterstützte Kommunikationsschnittstellen unterscheiden.
+Die in diesem Projekt verwendeten Varianten verfügen über zwei unabhängige 32-Bit-Prozessorkerne mit einer maximalen 
+Taktfrequenz von bis zu 240\,MHz. Diese Dual-Core-Architektur ermöglicht es, 
+rechenintensive Aufgaben wie Signalverarbeitung und drahtlose Kommunikation parallel 
+auszuführen.
+
+Neben den Kommunikationsschnittstellen bieten die Bausteine der Familie umfangreiche 
+Peripheriefunktionen, darunter mehrere UART-, SPI- und I²C-Schnittstellen, 
+GPIO-Pins (General Purpose Input/Output), ADCs (Analog-Digital-Wandler), PWM-Kanäle 
+(Pulse Width Modulation) sowie kapazitive Berührungssensoren \cite{espressif_esp32}. 
+
+\subsubsection{Software-Entwicklung und Ökosystem}
+\label{subsubsec:esp32-software}
+
+Espressif Systems stellt mit dem ESP-IDF (Espressif IoT Development Framework) eine 
+umfassende Entwicklungsumgebung bereit, die auf dem FreeRTOS-Echtzeitbetriebssystem 
+basiert und native Unterstützung für C/C++-Programmierung bietet. Daneben existiert eine 
+breite Community-Unterstützung für alternative Entwicklungsumgebungen wie Arduino IDE, 
+PlatformIO sowie MicroPython.
+
+Die Integration des ESP32 in Entwicklungsumgebungen sowie die Verfügbarkeit 
+zahlreicher Open-Source-Bibliotheken haben die Einstiegshürde deutlich gesenkt und den 
+Einsatz des Mikrocontrollers sowohl im Amateur- als auch im industriellen Kontext 
+gefördert.
+
+\subsubsection{Einsatz im entwickelten System}
+\label{subsubsec:esp32-system}
+
+Im Rahmen dieser Arbeit bildet der ESP32 die hardwaretechnische Grundlage sowohl für die 
+zentrale Bridge als auch für die dezentralen LED-Tubes. Die Dual-Core-Architektur 
+ermöglicht die parallele Verarbeitung von Netzwerkkommunikation (ESP-NOW, Art-Net) auf 
+einem Kern und die Ansteuerung der LED-Hardware auf dem zweiten Kern.
+
+Die integrierte WLAN-Funktionalität wird für die Implementierung des proprietären 
+ESP-NOW-Protokolls genutzt, welches die drahtlose Datenübertragung zwischen Bridge und 
+Tubes realisiert. Gleichzeitig erlaubt die Ethernet-Erweiterbarkeit über externe Module 
+die Anbindung der Bridge an professionelle Lichtsteuersysteme mittels Art-Net.
+
+Die GPIO-Pins dienen der Ansteuerung der Peripheriekomponenten, etwa der LED-Strips und 
+der übrigen in der Schaltung verbauten ICs (Integrated Circuits).
+Die Leistungsfähigkeit des ESP32 stellt sicher, dass die zeitkritischen Anforderungen der Lichtsteuerung erfüllt werden können, 
+während gleichzeitig die Flexibilität für eventuelle zukünftige Erweiterungen gegeben ist.
+
+\section{Kommunikationsprotokolle}
+\label{sec:kommunikationsprotokolle}
+
+\subsection{DMX512}
+\label{subsec:dmx512}
+
+DMX512 (Digital Multiplex 512) ist ein weit verbreiteter Industriestandard für die
+Steuerung von Bühnen- und Veranstaltungstechnik. Der Standard wurde 1986 vom United 
+States Institute for Theatre Technology (USITT) entwickelt und wird heute von der 
+Entertainment Services and Technology Association (ESTA) gepflegt. Er wurde seither in 
+mehreren Revisionen fortgeschrieben die aktuelle Fassung ist ANSI E1.11-2024 
+\cite{ANSI_E1.11_2024}.
+
+\subsubsection{Technische Grundlagen}
+\label{subsubsec:dmx512-technik}
+
+DMX512 überträgt Daten seriell und unidirektional über eine differentielle
+RS-485-Leitung mit einer Datenrate von 250\,kbit/s \cite{ANSI_E1.11_2024}. Die
+Übertragung erfolgt in Form von Paketen, die neben dem einleitenden START-Code bis zu
+512 Datenfelder (Slots) umfassen. Jeder Slot wird durch einen 8-Bit-Wert (0--255)
+repräsentiert, der beispielsweise die Helligkeit, Farbe oder Position eines Geräts
+definiert.
+
+Die physikalische Verbindung erfolgt über eine Daisy-Chain-Topologie, bei der die Geräte
+in Reihe geschaltet werden. Der Standard schreibt vor, die Leitung abzuschließen, um
+Reflexionen und die daraus folgenden Fehlfunktionen zu vermeiden als Abschluss ist ein
+Widerstand von 120\,Ohm vorgesehen. Die Belastung einer DMX512-Linie ist zudem auf 32
+Unit Loads begrenzt, wobei jeder Empfängereingang höchstens eine Unit Load darstellen
+darf \cite{ANSI_E1.11_2024}. Größere Installationen erfordern daher Verstärker
+(DMX-Splitter), die zugleich die nutzbare Leitungslänge erhöhen. Eine maximale
+Leitungslänge legt der Standard selbst nicht fest, sie ergibt sich aus den elektrischen
+Eigenschaften der RS-485-Strecke und liegt in der Praxis im Bereich einiger hundert
+Meter.
+
+\subsubsection{Protokollstruktur}
+\label{subsubsec:dmx512-protokoll}
+
+Ein DMX512-Paket beginnt mit einer Reset-Sequenz aus \textit{Break}, einer Unterbrechung
+der Datenleitung, dem darauf folgenden \textit{Mark After Break} (MAB) und dem
+\textit{START-Code}. Der START-Code kennzeichnet die Art der nachfolgenden Daten für
+Beleuchtungsdaten ist der NULL-START-Code mit dem Wert 0x00 vorgesehen. Anschließend
+folgen bis zu 512 Datenslots. Für die Zeiten der Reset-Sequenz unterscheidet der
+Standard zwischen Sende- und Empfangsseite: Sender müssen einen Break von mindestens
+92\,µs und einen MAB von mindestens 12\,µs erzeugen, während Empfänger bereits einen
+Break ab 88\,µs und einen MAB ab 8\,µs als Paketbeginn erkennen müssen
+\cite{ANSI_E1.11_2024}. Für die Implementierung des Empfängers ist somit die geringere,
+für die des Senders die höhere Vorgabe maßgeblich.
+
+Aus Datenrate und Paketaufbau ergibt sich für ein vollständiges Paket mit 513 Slots eine
+minimale Aktualisierungszeit von 22,7\,ms und damit eine maximale Wiederholrate von
+44\,Hz \cite{ANSI_E1.11_2024} werden weniger Slots übertragen, steigt die erreichbare
+Rate entsprechend. Eine bidirektionale Kommunikation ist im regulären Datenpfad nicht
+vorgesehen, sodass der Sender keine Rückmeldung über den Status der Empfangsgeräte
+erhält.
+
+\subsubsection{Einsatz in der Veranstaltungstechnik}
+\label{subsubsec:dmx512-einsatz}
+
+DMX512 hat sich als De-facto-Standard in der professionellen Lichtsteuerung etabliert
+und wird von nahezu allen Herstellern unterstützt. Die Einfachheit des Protokolls sowie
+die deterministischen Übertragungseigenschaften machen es besonders geeignet für
+zeitkritische Anwendungen, bei denen eine zuverlässige Steuerung
+erforderlich ist.
+
+Im Kontext des entwickelten LED-Tube-Systems dient der Aufbau des DMX512-Pakets als
+Vorbild für das interne Datenformat, in dem die Steuerbefehle repräsentiert werden. Die Bridge kann DMX-Daten sowohl über Art-Net 
+(Ethernet) als auch über eine DMX-Schnittstelle (XLR) empfangen und verarbeitet 
+diese anschließend zur Übertragung an die LED-Tubes. Dabei bildet die Struktur des 
+DMX512-Frames die Grundlage für das entwickelte drahtlose Übertragungsprotokoll, das 
+über ESP-NOW an die Tubes übertragen wird. 
+Die Orientierung an diesem etablierten Standard ermöglicht eine nahtlose Integration in 
+bestehende Lichtsteuersysteme und gewährleistet Kompatibilität mit professioneller 
+Steuerungssoftware.
+
+
+\subsection{Art-Net}
+\label{subsec:artnet}
+
+Art-Net ist ein Ethernet-basiertes Kommunikationsprotokoll, das von Artistic Licence
+entwickelt wurde und die Übertragung von DMX512-Daten über IP-Netzwerke ermöglicht.
+Seit seiner Einführung im Jahr 1998 hat sich Art-Net zu einem weit verbreiteten Standard
+in der professionellen Lichtsteuerung entwickelt und wird von zahlreichen
+Softwarelösungen und Hardwarekomponenten unterstützt.
+
+Die Etablierung von Art-Net als De-facto-Standard in der professionellen 
+Veranstaltungstechnik ist auf die Limitierung klassischer DMX512-Verbindungen 
+zurückzuführen. Während eine einzelne DMX-Linie lediglich 512 Kanäle/Byte bereitstellt, 
+erfordern moderne Installationen mit einer Vielzahl komplexer Scheinwerfer, 
+LED-Pixelmatrizen oder hochauflösenden LED-Wänden häufig mehrere tausend Steuerkanäle. 
+Die Art-Net-4-Spezifikation sieht ein theoretisches Maximum von 32.768 DMX-Universen 
+vor, wie viele davon tatsächlich übertragen werden können, hängt von der verfügbaren 
+Netzwerkbandbreite und der Leistungsfähigkeit der beteiligten Geräte ab 
+\cite{artnet4}. Art-Net adressiert damit die gestiegenen Bandbreitenanforderungen 
+professioneller Lichtinstallationen. Insbesondere bei der Ansteuerung von LED-Pixelmonitoren, 
+bei denen jeder einzelne Pixel mehrere DMX-Kanäle (typischerweise RGB oder RGBW) 
+beansprucht, stößt klassisches DMX512 schnell an seine Grenzen, während Art-Net eine 
+skalierbare Lösung bietet.
+
+\subsubsection{Funktionsweise und Architektur}
+\label{subsubsec:artnet-funktion}
+
+Art-Net kapselt DMX512-Daten in UDP-Pakete (User Datagram Protocol) und überträgt diese
+über ein Standard-Ethernet-Netzwerk. Während eine DMX512-Linie auf ein einzelnes
+RS-485-Segment mit einem Universum von 512 Kanälen beschränkt ist, ermöglicht Art-Net die
+gleichzeitige Übertragung mehrerer Universen über eine einzige Netzwerkverbindung.
+
+Ein Art-Net-Netzwerk besteht typischerweise aus einem oder mehreren \textit{Controllern}
+(z.\,B. Lichtsteuerungssoftware), die Art-Net-Pakete senden, sowie \textit{Nodes}, die
+diese Pakete empfangen und in DMX512-Signale umwandeln. Die Nodes können dabei sowohl
+als Sender als auch als Empfänger fungieren, wodurch bidirektionale Kommunikation
+möglich ist.
+
+\subsubsection{Protokollstruktur}
+\label{subsubsec:artnet-protokoll}
+
+Jedes Art-Net-Paket beginnt mit einer acht Byte langen, nullterminierten Kennung, 
+gefolgt von einem OpCode, der den Pakettyp bestimmt, der
+Protokollversion sowie weiteren Verwaltungsinformationen \cite{artnet4}. Das Ziel wird
+über die Port-Address adressiert, eine 15\,Bit breite Zahl, die sich aus den
+Feldern Net, Sub-Net und Universe34 zusammensetzt und die 32.768 möglichen Universen
+abbildet \cite{artnet4}. Der Nutzdatenbereich umfasst bis zu 512 Byte, entsprechend
+einem DMX512-Universum.
+
+\subsubsection{Vorteile gegenüber klassischem DMX512}
+\label{subsubsec:artnet-vorteile}
+
+Durch die Nutzung von Ethernet-Infrastruktur bietet Art-Net mehrere Vorteile gegenüber
+klassischem DMX512:
+\begin{itemize}
+    \item \textbf{Skalierbarkeit:} Mehrere DMX-Universen können parallel über eine
+          einzige Netzwerkverbindung übertragen werden.
+    \item \textbf{Reichweite:} Die Ausdehnung ist nicht mehr durch die Grenzen eines
+          einzelnen RS-485-Segments bestimmt, sondern kann mit
+          Standard-Netzwerkkomponenten nahezu beliebig erweitert werden.
+    \item \textbf{Bidirektionalität:} Rückmeldungen über Gerätestatus und Fehlerzustände sind möglich.
+    \item \textbf{Flexibilität:} Bestehende IT-Infrastrukturen können genutzt werden,
+          wodurch separate DMX-Verkabelung entfällt.
+\end{itemize}
+
+\subsubsection{Einsatz im entwickelten System}
+\label{subsubsec:artnet-system}
+
+Im entwickelten LED-Tube-System dient Art-Net als Schnittstelle zur Anbindung an
+professionelle Lichtsteuerungssoftware. Die Bridge empfängt Art-Net-Pakete über ihre
+Ethernet-Schnittstelle und extrahiert daraus die DMX512-Daten, die anschließend wie im
+kabelgebundenen DMX-Betrieb weiterverarbeitet werden.
+
+Darüber hinaus ist ein kabelgebundener Pixelsteuerungsmodus vorgesehen, in dem die
+einzelnen Pixel der LED-Strips über eine Datenleitung angesprochen werden. Die Hardware
+der Bridge ist dafür bereits vorbereitet
+(Abschnitt~\ref{subsec:bridge-pcb}), die Umsetzung dieses Modus ist jedoch nicht
+Gegenstand der vorliegenden Arbeit. Durch die Unterstützung von Art-Net bleibt das System
+mit einer Vielzahl bestehender Steuerungslösungen kompatibel.
+
+\section{Drahtlose Kommunikation}
+\label{sec:drahtlose-kommunikation}
+
+Drahtlose Kommunikation stellt einen zentralen Bestandteil moderner eingebetteter
+Systeme dar, insbesondere im Kontext verteilter Architekturen und modularer
+Installationen. Im Vergleich zu kabelgebundenen Kommunikationsformen bietet sie eine
+höhere Flexibilität und vereinfacht die physische Integration einzelner Komponenten.
+Gleichzeitig ergeben sich jedoch neue Herausforderungen hinsichtlich Latenz,
+Zuverlässigkeit, Störanfälligkeit und Energieeffizienz.
+
+Im vorliegenden System wird drahtlose Kommunikation eingesetzt, um Steuerdaten von einer
+zentralen Bridge an mehrere räumlich verteilte LED-Tubes zu übertragen. Zunächst werden
+das genutzte Frequenzband und der Zugriff auf das Übertragungsmedium betrachtet, da
+beide das Verhalten der Funkstrecke unter Last bestimmen. anschließend wird das
+eingesetzte Protokoll ESP-NOW vorgestellt.
+
+\subsection{Das 2,4-GHz-Band und der Zugriff auf das Übertragungsmedium}
+\label{subsec:24ghz-medienzugriff}
+
+Die Übertragung erfolgt im Frequenzbereich von 2400 bis 2483,5\,MHz. Dieses Band steht
+weltweit anmeldefrei zur Verfügung. in Europa regelt die harmonisierte Norm
+ETSI EN 300 328 die Nutzung durch Breitband-Datenübertragungssysteme
+\cite{etsi_en300328}. Genutzt wird es nicht exklusiv, sondern gemeinsam von WLAN,
+Bluetooth, Zigbee und weiteren Funkanwendungen, die die genannte Norm ausdrücklich
+gemeinsam erfasst. Für ein Steuerungssystem
+folgt daraus, dass die verfügbare Übertragungskapazität nicht allein von der eigenen
+Hardware abhängt, sondern von der Belegung des Kanals durch fremde Sender.
+
+Innerhalb des Bands definiert IEEE 802.11 in Europa dreizehn Kanäle im Abstand von je
+5\,MHz, während ein Kanal eine Bandbreite von etwa 20\,MHz belegt. 
+
+Der Zugriff auf das gemeinsam genutzte Medium erfolgt nach dem in IEEE 802.11
+festgelegten Verfahren CSMA/CA (Carrier Sense Multiple Access with Collision
+Avoidance) \cite{ieee80211_2024}. Eine Station prüft vor dem Senden, ob der Kanal frei
+ist, wartet bei belegtem Kanal ab und beginnt die Übertragung erst nach einer zusätzlich
+zufällig gewählten Wartezeit (Backoff). Kollisionen werden dadurch vermieden, gleichzeitig verzögern sich
+Sendevorgänge bei hoher Fremdlast oder unterbleiben ganz. Für die Bewertung der
+Zuverlässigkeit ist diese Unterscheidung wesentlich: Eine ausgelastete Umgebung führt
+nicht zu verfälschten, sondern zu verspäteten oder ausbleibenden Paketen. Die
+messtechnische Untersuchung dieses Effekts erfolgt in
+Abschnitt~\ref{sec:stoerfestigkeit}.
+
+\subsection{ESP-NOW}
+\label{subsec:espnow-protokoll}
+Das von Espressif Systems entwickelte ESP-NOW-Protokoll stellt eine proprietäre, verbindungslose 
+Kommunikationstechnologie dar, die primär für Low-Power-Anwendungen im Bereich des Internet of Things (IoT) konzipiert wurde. 
+Im Gegensatz zu herkömmlichen WLAN-Verbindungen nach dem IEEE 802.11-Standard, welche eine zeit- und 
+energieintensive Assoziierung mit einem Access Point sowie den vollständigen Durchlauf des TCP/IP-Stacks erfordern, 
+operiert ESP-NOW unmittelbar auf der Sicherungsschicht (Data Link Layer) des ISO-OSI-Modells.
+
+Technisch basiert die Übertragung auf sogenannten \textit{IEEE 802.11 Vendor Specific Action Frames} \cite{espressif_espnow}. 
+Diese ermöglichen es den Knotenpunkten, Datenpakete direkt über die MAC-Adresse zu adressieren, ohne dass ein 
+vorheriger Handshake oder eine IP-Zuweisung notwendig ist. Daraus resultiert eine signifikante Reduktion 
+der Latenzzeit sowie des energetischen Overheads, da die Funkmodule lediglich für die Dauer der Übertragung aktiviert werden müssen.
+
+Trotz der verbindungslosen Natur unterstützt das Protokoll eine optionale bidirektionale 
+Kommunikation durch Bestätigungs-Frames (Acknowledgements) sowie eine Verschlüsselung der 
+Action Frames \cite{espressif_espnow}. Die maximale Nutzlast 
+je Datenpaket beträgt in der ersten Version 250 Byte und wurde in der zweiten 
+Version auf 1470 Byte erhöht \cite{espressif_espnow}. Mit Version 1.0 lässt sich somit nur 
+etwa ein halber DMX512-Frame übertragen, während Version 2.0 ein vollständiges 
+DMX-Universum in einem einzigen Paket aufnehmen kann.
+
+Version 2 ist abwärtskompatibel zu Version 1, sodass ältere Geräte weiterhin mit der neuen Version kommunizieren können, 
+jedoch nur die geringere Payload-Größe von 250 Byte nutzen können.
+Die Standard-Übertragungsrate gibt Espressif mit 1\,Mbit/s an \cite{espressif_espnow}.
+
+ESP-NOW verwendet ein Peer-to-Peer- beziehungsweise Broadcast-Kommunikationsmodell, bei
+dem Datenpakete direkt zwischen den beteiligten Knoten ausgetauscht werden. Für die
+gerichtete Übertragung muss jeder Empfänger zuvor als Peer registriert werden, wobei die
+Zahl gleichzeitig registrierter Peers auf 20 begrenzt ist \cite{espressif_espnow}. Diese
+Begrenzung entfällt im Broadcast-Betrieb, da dort sämtliche Empfänger über eine einzige
+Broadcast-Adresse erreicht werden.
+
+\subsubsection{Latenz, Zuverlässigkeit und Einschränkungen}
+\label{subsubsec:espnow-eigenschaften}
+
+Durch den Verzicht auf den vollständigen WLAN-Stack weist ESP-NOW in der Regel eine
+geringere Latenz als klassische WLAN-Kommunikation auf. Gleichzeitig existieren jedoch
+keine integrierten Mechanismen zur garantierten Zustellung oder zur Reihenfolgekontrolle
+von Paketen. Der Sendestatus, den die Anwendung nach einem Sendevorgang erhält, bezieht
+sich ausschließlich auf die MAC-Schicht, ob die Daten die Anwendungsschicht des
+Empfängers erreichen, ist damit ausdrücklich nicht sichergestellt
+\cite{espressif_espnow}.
+
+Die Zuverlässigkeit der Übertragung hängt daher stark von den Umgebungsbedingungen, der
+Anzahl der beteiligten Knoten sowie der Paketfrequenz ab. Da ESP-NOW auf 802.11-Frames
+aufsetzt, unterliegt es zudem dem in
+Abschnitt~\ref{subsec:24ghz-medienzugriff} beschriebenen Medienzugriff: Bei hoher
+Kanalauslastung verzögern sich Sendevorgänge oder unterbleiben ganz. Paketverluste sind
+somit prinzipiell möglich und müssen auf Anwendungsebene berücksichtigt werden.
+
+\subsubsection{Bedeutung für das entwickelte System}
+\label{subsubsec:espnow-system}
+
+ESP-NOW bildet die Grundlage für die drahtlose Übertragung von DMX-Steuerdaten von der
+Bridge zu den LED-Tubes. Die geringe Latenz und der geringe Overhead machen das
+Protokoll besonders geeignet für zeitkritische Steuerinformationen, wie sie in der
+Lichtsteuerung erforderlich sind.
+
+Gleichzeitig stellt die fehlende Zustellgarantie eine zentrale Herausforderung dar, die
+im Rahmen dieser Arbeit durch experimentelle Untersuchungen der Verbindungsstabilität
+analysiert wird. Die Ergebnisse dieser Untersuchungen bilden die Basis für die Bewertung
+der Eignung von ESP-NOW als drahtlose Alternative zu kabelgebundenen DMX-Verbindungen.

@@ -1,0 +1,224 @@
+\chapter{Anhang}
+\label{chap:anhang}
+
+
+\section{Schaltpläne}
+\label{sec:anhang-schaltplaene}
+
+\begin{figure}[p]
+    \centering
+    \rotatebox{90}{\includegraphics[width=0.80\textheight]{images/anhang/sch_bridge.pdf}}
+    \caption{Schaltplan der Bridge (Abschnitt~\ref{subsec:bridge-pcb}).}
+    \label{fig:sch-bridge}
+\end{figure}
+
+\begin{figure}[p]
+    \centering
+    \rotatebox{90}{\includegraphics[width=0.80\textheight]{images/anhang/sch_tube.pdf}}
+    \caption{Schaltplan der Leuchtröhre (Abschnitt~\ref{subsec:tube-mainboard}).}
+    \label{fig:sch-tube}
+\end{figure}
+
+\begin{figure}[p]
+    \centering
+    \rotatebox{90}{\includegraphics[width=0.80\textheight]{images/anhang/sch_interface.pdf}}
+    \caption{Schaltplan des Interface-PCB (Abschnitt~\ref{subsec:interface-pcb}).}
+    \label{fig:sch-interface}
+\end{figure}
+
+\clearpage
+
+\section{Leiterplattenlayouts}
+\label{sec:anhang-layouts}
+
+Dargestellt sind Kupferlage und Bestückungsdruck; die Unterseiten sind
+spiegelbildlich, also in Durchsicht von oben, gezeichnet.
+
+\begin{figure}[htbp]
+    \centering
+    \begin{subfigure}[b]{\linewidth}
+        \centering
+        \includegraphics[width=0.92\linewidth]{images/anhang/pcb_bridge_top.pdf}
+        \caption{Oberseite (F.Cu)}
+    \end{subfigure}
+
+    \vspace{1em}
+
+    \begin{subfigure}[b]{\linewidth}
+        \centering
+        \includegraphics[width=0.92\linewidth]{images/anhang/pcb_bridge_bot.pdf}
+        \caption{Unterseite (B.Cu)}
+    \end{subfigure}
+    \caption{Leiterplattenlayout der Bridge. Der linke Bereich um die XLR-Buchsen
+        trägt keine Massefläche des Hauptteils; beide Massepotenziale bleiben
+        getrennt (Abschnitt~\ref{subsec:bridge-pcb}).}
+    \label{fig:pcb-bridge}
+\end{figure}
+
+\begin{figure}[htbp]
+    \centering
+    \begin{subfigure}[b]{0.32\linewidth}
+        \centering
+        \includegraphics[height=6.5cm]{images/anhang/pcb_tube_top.pdf}
+        \caption{Tube, Oberseite}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.32\linewidth}
+        \centering
+        \includegraphics[height=6.5cm]{images/anhang/pcb_tube_bot.pdf}
+        \caption{Tube, Unterseite}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.32\linewidth}
+        \centering
+        \includegraphics[height=6.5cm]{images/anhang/pcb_interface_top.pdf}
+        \caption{Interface, Oberseite}
+    \end{subfigure}
+    \caption{Leiterplattenlayouts von Tube- und Interface-PCB. Der schmale
+        Formfaktor folgt der Innengeometrie des Aluminiumprofils
+        (Abschnitt~\ref{sec:gehaeuse}).}
+    \label{fig:pcb-tube-interface}
+\end{figure}
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[height=6.5cm]{images/anhang/pcb_interface_bot.pdf}
+    \caption{Interface-PCB, Unterseite. Auf dieser Seite sind Display und Taster
+        bestückt.}
+    \label{fig:pcb-interface-bot}
+\end{figure}
+
+\clearpage
+
+\section{Vollständige Messwerttabellen}
+\label{sec:anhang-messwerte}
+
+Kapitel~\ref{chap:evaluierung} druckt je Messreihe eine Auswahl der Kennzahlen
+ab. Die folgenden Tabellen führen sämtliche berechneten Größen auf. Sie werden
+aus denselben unveränderten Rohdaten erzeugt wie die Tabellen des Hauptteils
+(Abschnitt~\ref{subsec:messgrenzen}).
+
+\begin{table}[H]
+    \centering
+    \small
+    \caption{Zuordnung der Rohdatendateien zu den Messpunkten. Alle Läufe wurden
+        mit derselben Mess-Firmware auf WLAN-Kanal~1 über 300\,s aufgezeichnet
+        (Abschnitt~\ref{subsec:messaufbau}).}
+    \label{tab:messlaeufe}
+    \begin{tabular}{llll}
+        \toprule
+        Rohdatendatei & Messreihe & Bedingung & Auswertung \\
+        \midrule
+        \texttt{range\_0m.csv}          & Reichweite & 0\,m, Sicht    & Abschnitt~\ref{sec:idealbedingungen}, \ref{sec:reichweitentest} \\
+        \texttt{range\_10m.csv}         & Reichweite & 10\,m, Sicht   & Abschnitt~\ref{sec:idealbedingungen}, \ref{sec:reichweitentest} \\
+        \texttt{range\_50m.csv}         & Reichweite & 50\,m, Sicht   & Abschnitt~\ref{sec:reichweitentest} \\
+        \texttt{range\_100m.csv}        & Reichweite & 100\,m, Sicht  & Abschnitt~\ref{sec:reichweitentest} \\
+        \texttt{range\_150m.csv}        & Reichweite & 150\,m, Sicht  & Abschnitt~\ref{sec:reichweitentest} \\
+        \texttt{range\_200m.csv}        & Reichweite & 200\,m, Sicht  & Abschnitt~\ref{sec:reichweitentest} \\
+        \midrule
+        \texttt{range\_hidden\_10m.csv}  & Reichweite & 10\,m, verdeckt  & Abschnitt~\ref{sec:reichweitentest} \\
+        \texttt{range\_hidden\_50m.csv}  & Reichweite & 50\,m, verdeckt  & Abschnitt~\ref{sec:reichweitentest} \\
+        \texttt{range\_hidden\_100m.csv} & Reichweite & 100\,m, verdeckt & Abschnitt~\ref{sec:reichweitentest} \\
+        \texttt{range\_hidden\_150m.csv} & Reichweite & 150\,m, verdeckt & Abschnitt~\ref{sec:reichweitentest} \\
+        \texttt{range\_hidden\_200m.csv} & Reichweite & 200\,m, verdeckt & Abschnitt~\ref{sec:reichweitentest} \\
+        \midrule
+        \texttt{interference\_noisy.csv} & Störfestigkeit & Stoßzeit  & Abschnitt~\ref{sec:stoerfestigkeit} \\
+        \texttt{interference\_calm.csv}  & Störfestigkeit & Nebenzeit & Abschnitt~\ref{sec:stoerfestigkeit} \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+\input{../test_programs/results/analysis/tables/range_metrics_full.tex}
+
+\input{../test_programs/results/analysis/tables/range_hidden_metrics_full.tex}
+
+\input{../test_programs/results/analysis/tables/interference_metrics_full.tex}
+
+\clearpage
+
+\section{Messwerte Leistungsaufnahme}
+\label{sec:anhang-leistungsaufnahme}
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{\linewidth}
+        \centering
+        \includegraphics[width=0.3\linewidth]{images/anhang/power_consumption_power_supply_only.jpeg}
+        \caption{Leistungsaufnahme des Netzteils ohne angeschlossene Last.}
+        \label{fig:power-supply-only}
+    \end{subfigure}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{\linewidth}
+        \centering
+        \includegraphics[width=0.3\linewidth]{images/anhang/power_consumption_tube_no_light.jpeg}
+        \caption{Leistungsaufnahme der Leuchtröhre ohne angeschlossene LEDs.}
+        \label{fig:power-tube-no-light}
+    \end{subfigure}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{\linewidth}
+        \centering
+        \includegraphics[width=0.3\linewidth]{images/anhang/power_consumption_tube_fully_on.jpeg}
+        \caption{Leistungsaufnahme der Leuchtröhre mit angeschlossenen LEDs.}
+        \label{fig:power-tube-fully-on}
+    \end{subfigure}
+\end{figure}
+
+\section{Reproduktion der Ergebnisse}
+\label{sec:anhang-reproduktion}
+
+Firmware, Mess-Firmware, Rohdaten, Auswertungsskript, Leiterplattenentwürfe
+einschließlich Fertigungsdaten und Gehäusedateien sind unter
+\url{https://github.com/nichtrami/led_tube} veröffentlicht. Die gezeigten
+Messergebnisse wurden mit dem Stand zum Zeitpunkt der Abgabe erhoben.
+
+\begin{table}[H]
+    \centering
+    \small
+    \caption{Verzeichnisstruktur des Repositorys.}
+    \label{tab:repo-struktur}
+    \begin{tabular}{ll}
+        \toprule
+        Verzeichnis & Inhalt \\
+        \midrule
+        \texttt{src/}            & Anwendungsfirmware beider Gerätetypen \\
+        \texttt{test\_programs/} & Mess-Firmware, Rohdaten und Auswertung \\
+        \texttt{pcb/}            & KiCad-Projekte und Gerber-Daten der drei Baugruppen \\
+        \texttt{housings/}       & Gehäuse als 3MF-Dateien für den 3D-Druck \\
+        \texttt{documents/}      & Datenblätter der eingesetzten Bauteile \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+Der Gerätetyp wird über die PlatformIO-Zielumgebung gewählt
+(Abschnitt~\ref{sec:entwicklungsumgebung}), die Bibliotheksabhängigkeiten sind
+in \texttt{platformio.ini} versioniert.
+
+\begin{lstlisting}[language=bash, caption={Übersetzen und Flashen.}, captionpos=b]
+pio run -e led_tube -t upload    # Leuchtroehre
+pio run -e bridge   -t upload    # Bridge
+\end{lstlisting}
+
+Die Mess-Firmware bindet per \texttt{build\_src\_filter} den produktiven
+\texttt{WirelessDmxController} unverändert ein
+(Abschnitt~\ref{sec:testaufbau}). \texttt{capture.sh} zeichnet die serielle
+Ausgabe unverändert als CSV auf; der Dateiname bestimmt Testtyp und
+Messbedingung. \texttt{analyze.py} erzeugt daraus die Abbildungen und Tabellen
+dieser Arbeit neu.
+
+\begin{lstlisting}[language=bash, caption={Messreihe aufzeichnen und auswerten.}, captionpos=b]
+pio run -e test_reliability_bridge -t upload
+pio run -e test_reliability_tube   -t upload
+
+cd test_programs/results
+./capture.sh raw/range_50m.csv 300      # 300 s aufzeichnen
+
+cd analysis
+pip install -r requirements.txt
+python3 analyze.py                      # erzeugt figures/ und tables/
+\end{lstlisting}

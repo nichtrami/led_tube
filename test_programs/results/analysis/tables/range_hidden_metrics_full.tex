@@ -1,0 +1,30 @@
+% Requires \usepackage{booktabs}; otherwise replace \toprule etc. with \hline.
+\begin{table}[htbp]
+  \centering
+  \small
+  \begin{tabular}{llrrrrr}
+    \toprule
+    Kennzahl & Einheit & 10 m & 50 m & 100 m & 150 m & 200 m \\
+    \midrule
+    Messdauer & s & 299 & 299 & 299 & 299 & 299 \\
+    Erwartete Sequenzen &  & 11992 & 11993 & 11993 & 11992 & 11990 \\
+    Empfangene Sequenzen &  & 11934 & 11743 & 10691 & 8732 & 7639 \\
+    Verlorene Sequenzen &  & 58 & 250 & 1302 & 3260 & 4351 \\
+    Sequenzverlust, kumuliert & \% & 0,48 & 2,08 & 10,86 & 27,18 & 36,29 \\
+    Fensterverlust, Mittel & \% & 0,45 & 2,07 & 10,81 & 27,15 & 36,19 \\
+    Fensterverlust, p95 & \% & 0 & 10,08 & 36,64 & 60,80 & 63,67 \\
+    Fensterverlust, Maximum & \% & 30,91 & 41,46 & 87,80 & 82,93 & 85,71 \\
+    Verlustfreie Fenster & \% & 97,67 & 64,33 & 25,67 & 0,67 & 0 \\
+    Fenster mit Ausfall ab 50\,ms & \% & 1,67 & 7,33 & 37 & 80 & 95,67 \\
+    Längste Verlustserie & Sequenzen & 3 & 9 & 23 & 28 & 38 \\
+    Längste Verlustserie & ms & 75 & 225 & 575 & 700 & 950 \\
+    Jitter, Mittel & ms & 6,96 & 9,23 & 16,45 & 26,59 & 32,12 \\
+    Kopien je Sequenz, Mittel &  & 4,80 & 3,57 & 2,72 & 1,87 & 1,61 \\
+    Kopien je Sequenz, Minimum &  & 2,34 & 1,33 & 1,20 & 1,17 & 1 \\
+    RSSI, Mittel & dBm & $-$81,23 & $-$77,85 & $-$82,97 & $-$48,70 & $-$77,39 \\
+    RSSI, Minimum & dBm & $-$95 & $-$95 & $-$95 & $-$94 & $-$93 \\
+    \bottomrule
+\end{tabular}
+\caption{Vollständige Kennzahlen der Reichweitenmessung (ohne Sichtverbindung). Auswahl daraus in Tabelle~\ref{tab:range-hidden-summary}.}
+  \label{tab:range-hidden-full}
+\end{table}

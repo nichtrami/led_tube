@@ -1,0 +1,27 @@
+\begin{abstract}
+Diese Arbeit befasst sich mit der Entwicklung und experimentellen Untersuchung eines Beleuchtungssystems für Veranstaltungen, das aus LED-Leuchtröhren mit funkgestützter Übertragung der Steuersignale besteht.
+Ausgangspunkt ist der erhebliche Aufwand, den die Signalverkabelung nach dem DMX512-Standard bei temporären und häufig wechselnden Aufbauten verursacht, sowie die Lücke zwischen funktional umfassenden, jedoch kostenintensiven Premiumsystemen und preisgünstigen Alternativen mit deutlich reduziertem Funktionsumfang.
+Ziel ist ein offengelegtes und nachbaubares System, das Funkempfang, Energieversorgung und pixelgenaue Ansteuerung im Leuchtmittel selbst vereint und die Signalverkabelung dadurch vollständig entfallen lässt.
+
+Zur Umsetzung wurde eine Bridge auf Basis eines ESP32 entwickelt, die Steuerdaten aus einer bestehenden Lichtinfrastruktur über DMX512 entgegennimmt oder in einem eigenständigen Modus selbst erzeugt und über das Protokoll ESP-NOW als Broadcast an die Leuchtröhren verteilt.
+Da das Verfahren im Broadcast-Betrieb keine Zustellgarantie bietet, wird auf einen Rückkanal verzichtet und jeder Datenstand stattdessen mehrfach ausgesendet.
+Neben der Firmware beider Gerätetypen umfasst die Arbeit den Entwurf der Leiterplatten sowie der Gehäuse sämtliche Entwurfsdaten werden unter einer freien Lizenz veröffentlicht.
+Sämtliche Projektdateien sind unter \url{https://github.com/nichtrami/led_tube} frei zugänglich.
+
+Die Bewertung der Funkstrecke erfolgt über Messreihen von jeweils 300\,s, die mit der Zielhardware und dem produktiven Sendepfad erhoben wurden.
+Untersucht wurden eine Referenzmessung unter Idealbedingungen, zwei Reichweitenmessreihen mit und ohne Sichtverbindung über Distanzen bis 200\,m sowie der Betrieb unter realer Fremdfunklast.
+Als Bewertungsgrößen dienen der Anteil vollständig verlorener Sequenzwerte, die mittlere Anzahl empfangener Kopien je Sequenzwert als verbleibende Fehlerreserve sowie die Länge zusammenhängender Verlustserien.
+
+Unter Idealbedingungen wurde kein einziger von 23\,984 übertragenen Sequenzwerten verloren.
+Die geforderte Mindestreichweite von 50\,m wird mit freier Sicht bei 0,06\,\% Sequenzverlust und ohne Sichtverbindung bei 2,08\,\% erreicht, die vollständige Abschattung durch eine Stahlbetonstütze kostet dabei etwa den Faktor zwei der nutzbaren Distanz.
+Unter erhöhter Fremdfunklast bleibt der Verlust mit 0,51\,\% gering, enthält jedoch eine zusammenhängende Unterbrechung von 750\,ms, die auf die Konkurrenz um den Übertragungskanal zurückgeht.
+Die Empfangsredundanz erweist sich in allen Messreihen als früher Indikator einer sich verschlechternden Verbindung, da sie bereits messbar sinkt, während der Sequenzverlust noch nahezu bei null liegt.
+
+Das entwickelte System erfüllt die gestellten Anforderungen an Aktualisierungsrate, Reichweite und Zuverlässigkeit im vorgesehenen Einsatzbereich bei Materialkosten von rund 62\,€ je Leuchtröhre.
+Die Arbeit leistet damit einen Beitrag zur drahtlosen Ansteuerung verteilter eingebetteter Aktoren unter realen Umgebungsbedingungen und stellt zugleich eine reproduzierbar dokumentierte, quelloffene Alternative zu kommerziellen Systemen bereit.
+\end{abstract}
+
+\newpage
+\null
+\thispagestyle{empty}
+\newpage

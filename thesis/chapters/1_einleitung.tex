@@ -1,0 +1,122 @@
+\chapter{Einleitung}
+\label{chap:einleitung}
+
+\section{Motivation}
+\label{sec:motivation}
+
+Bühnenbeleuchtung ist ein zentraler Bestandteil moderner Theater-, Konzert- und
+Veranstaltungsproduktionen. Durch gezielte Lichtgestaltung können Atmosphäre,
+Stimmungen und visuelle Effekte erzeugt werden, die wesentlich zur Wahrnehmung
+einer Aufführung durch das Publikum beitragen. Neben der rein funktionalen
+Ausleuchtung der Bühne ermöglicht die Lichttechnik somit eine kreative und
+dramaturgische Gestaltung des gesamten Bühnengeschehens.
+
+Zur Steuerung professioneller Beleuchtungssysteme hat sich in der
+Veranstaltungstechnik das Protokoll DMX (Digital Multiplex) als De-facto-Standard
+etabliert. DMX erlaubt die zentrale Steuerung einer Vielzahl von
+Beleuchtungsgeräten über ein standardisiertes Kommunikationsprotokoll und bietet
+eine zuverlässige sowie flexible Möglichkeit zur Echtzeitsteuerung komplexer
+Lichtinstallationen.
+
+Die Signalführung dieses Standards ist jedoch kabelgebunden: Jedes
+Beleuchtungsgerät muss über eine eigene Leitung in eine durchgehende DMX-Kette
+eingebunden werden. Vor allem bei temporären Installationen, mobilen Bühnen oder
+häufig wechselnden Aufbauten wird die dafür erforderliche Verkabelung zu einem
+wesentlichen Komplexitätsfaktor. Vor diesem Hintergrund entsteht ein Interesse an
+flexibleren Lösungen, die den Verkabelungsaufwand bei gleichbleibender
+Funktionalität verringern.
+
+\section{Problemstellung}
+\label{sec:problemstellung}
+
+Die kabelgebundene Signalübertragung bietet eine hohe Zuverlässigkeit, führt in
+der Praxis jedoch zu drei Nachteilen, die den Einsatz insbesondere außerhalb
+fester Installationen erschweren.
+
+Der erste betrifft Zeit und Personal. Die Signalverkabelung erfordert eine
+sorgfältige Planung sowie die manuelle Verbindung sämtlicher Beleuchtungsgeräte
+innerhalb der DMX-Kette. Bei größeren Installationen entsteht dadurch ein
+erheblicher Zeitaufwand beim Auf- und Abbau, der zudem Personal mit
+entsprechender Erfahrung im Umgang mit Veranstaltungstechnik voraussetzt.
+
+Der zweite Nachteil ist materieller Art. Kabel und Verbindungselemente
+verursachen Kosten für Anschaffung, Wartung und Transport und müssen in
+ausreichender Länge und Anzahl vorgehalten werden. Mit der Zahl der Verbindungen
+steigt darüber hinaus die Zahl möglicher Fehlerquellen, was die Fehlersuche im
+laufenden Betrieb erschwert.
+
+Der dritte Nachteil liegt im verfügbaren Angebot. Zwar existieren bereits
+kommerzielle Lösungen zur drahtlosen Übertragung von DMX-Daten, diese sind jedoch
+häufig mit hohen Anschaffungskosten verbunden und richten sich primär an
+professionelle Großproduktionen. Für kleinere Produktionen, experimentelle
+Bühneninstallationen oder flexible Lichtsysteme stehen daher nur begrenzt
+kostengünstige und zugleich leistungsfähige Lösungen zur Verfügung.
+
+\section{Zielsetzung}
+\label{sec:zielsetzung}
+
+Ziel dieser Arbeit ist die Entwicklung eines Beleuchtungssystems für
+Veranstaltungen, das DMX-Steuersignale drahtlos an mehrere Leuchteinheiten
+überträgt. Diese werden in Form von LED-Leuchtröhren realisiert, die die
+empfangenen Steuerdaten unmittelbar in Lichtsignale umsetzen. Ein zentrales
+Element bildet eine sogenannte Bridge, welche die Steuerdaten aus einer
+bestehenden Lichtinfrastruktur entgegennimmt und an die Leuchtröhren verteilt.
+Die Arbeit umfasst dabei sowohl die Hardware als auch die Software beider
+Gerätetypen.
+
+Ein wesentliches Entwicklungsziel ist die Gewährleistung einer stabilen
+Datenübertragung mit hinreichender Aktualisierungsrate und zeitlicher Konstanz,
+sodass die zeitkritischen Anforderungen der Lichtsteuerung erfüllt werden. Dies
+schließt die robuste Funktion unter praxisnahen Bedingungen mit potenziellen
+Funkstörungen ausdrücklich ein.
+
+Darüber hinaus soll der Nachbau des Systems niedrigschwellig möglich sein.
+Vorgesehen sind deshalb ausschließlich frei zugängliche Komponenten, sodass auch
+Anwenderinnen und Anwender mit geringen Vorkenntnissen den Aufbau bewältigen
+können. Diesem Ziel folgt auch die Ausrichtung als Open-Source-Projekt: Neben der
+Software werden die Platinenlayouts der Elektronikbaugruppen sowie die 3D-Modelle
+der Gehäuse veröffentlicht. Damit sollen Transparenz geschaffen, die
+Nachvollziehbarkeit technischer Entscheidungen verbessert und die
+Weiterentwicklung durch Dritte erleichtert werden.
+
+\section{Wissenschaftliche und praktische Relevanz}
+\label{sec:wissenschaftliche-und-praktische-relevanz}
+
+Die Kommunikation in verteilten eingebetteten Systemen ist ein relevantes
+Forschungsfeld innerhalb der Informatik. Zuverlässigkeit, Latenzverhalten,
+Skalierbarkeit und Robustheit unter realen Einsatzbedingungen stellen dabei
+zentrale Fragestellungen dar. Das entwickelte System realisiert ein solches
+verteiltes eingebettetes Echtzeitsystem zur Steuerung von Aktoren und erlaubt es
+damit, Entwurfsentscheidungen, Leistungsgrenzen und Zielkonflikte zwischen
+Flexibilität, Komplexität und Übertragungsqualität systematisch zu untersuchen.
+Von besonderem Interesse ist die Frage, welche Zuverlässigkeit eine
+unidirektionale Funkstrecke ohne Zustellbestätigung unter realen
+Umgebungsbedingungen erreicht.
+
+Praktisch adressiert die Arbeit genau jenen Anwendungsbereich, für den nach
+Abschnitt~\ref{sec:problemstellung} bislang keine geeignete Lösung verfügbar ist.
+Da sämtliche Entwurfsdaten offengelegt werden, ist das Ergebnis nicht nur
+nachvollziehbar, sondern auch unmittelbar nachnutzbar.
+
+\section{Aufbau der Arbeit}
+\label{sec:aufbau-der-arbeit}
+
+Kapitel~\ref{chap:grundlagen} stellt die theoretischen Grundlagen zu
+eingebetteten Systemen, den verwendeten Kommunikationsprotokollen und der
+drahtlosen Übertragung vor. Kapitel~\ref{chap:stand-der-technik} ordnet die
+Arbeit in den Stand der Technik ein, indem kommerzielle Systeme und verwandte
+wissenschaftliche Arbeiten betrachtet und die bestehenden Lücken benannt werden.
+
+Auf dieser Grundlage leitet Kapitel~\ref{chap:anforderungsanalyse} die
+funktionalen und nicht-funktionalen Anforderungen ab.
+Kapitel~\ref{chap:systemarchitektur} beschreibt daraufhin die Architektur des
+Systems einschließlich der Hardware- und Softwarekomponenten von Bridge und
+Leuchtröhren, während Kapitel~\ref{chap:implementierung} deren konkrete Umsetzung
+darlegt.
+
+Kapitel~\ref{chap:evaluierung} untersucht das entwickelte System experimentell.
+Erhoben werden Messreihen zur Verbindungsstabilität, zur Aktualisierungsrate und
+zur Zuverlässigkeit der Übertragung, die anschließend den Anforderungen
+gegenübergestellt werden. Kapitel~\ref{chap:diskussion-und-ausblick} bewertet die
+Ergebnisse, zieht ein Fazit und zeigt Ansätze für zukünftige Weiterentwicklungen
+auf.

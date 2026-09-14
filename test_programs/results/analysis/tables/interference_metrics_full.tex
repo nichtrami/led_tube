@@ -1,0 +1,30 @@
+% Requires \usepackage{booktabs}; otherwise replace \toprule etc. with \hline.
+\begin{table}[htbp]
+  \centering
+  \small
+  \begin{tabular}{llrr}
+    \toprule
+    Kennzahl & Einheit & Nebenzeit & Stoßzeit \\
+    \midrule
+    Messdauer & s & 299 & 299 \\
+    Erwartete Sequenzen &  & 11992 & 11991 \\
+    Empfangene Sequenzen &  & 11991 & 11930 \\
+    Verlorene Sequenzen &  & 1 & 61 \\
+    Sequenzverlust, kumuliert & \% & 0,01 & 0,51 \\
+    Fensterverlust, Mittel & \% & 0,01 & 0,45 \\
+    Fensterverlust, p95 & \% & 0 & 2,50 \\
+    Fensterverlust, Maximum & \% & 2,50 & 56,60 \\
+    Verlustfreie Fenster & \% & 99,67 & 89,67 \\
+    Fenster mit Ausfall ab 50\,ms & \% & 0 & 0,33 \\
+    Längste Verlustserie & Sequenzen & 1 & 30 \\
+    Längste Verlustserie & ms & 25 & 750 \\
+    Jitter, Mittel & ms & 6,47 & 8,45 \\
+    Kopien je Sequenz, Mittel &  & 4,57 & 3,83 \\
+    Kopien je Sequenz, Minimum &  & 4,03 & 3 \\
+    RSSI, Mittel & dBm & $-$83,72 & $-$84,02 \\
+    RSSI, Minimum & dBm & $-$97 & $-$98 \\
+    \bottomrule
+\end{tabular}
+\caption{Vollständige Kennzahlen der Messreihe Störfestigkeit. Auswahl daraus in Tabelle~\ref{tab:interference-summary}.}
+  \label{tab:interference-full}
+\end{table}

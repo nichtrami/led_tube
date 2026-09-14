@@ -1,0 +1,365 @@
+\chapter{Anforderungsanalyse}
+\label{chap:anforderungsanalyse}
+
+Dieses Kapitel leitet aus der Zielsetzung der Arbeit
+(Abschnitt~\ref{sec:zielsetzung}) die Anforderungen an das zu entwickelnde System ab.
+Ausgangspunkt ist das Einsatzszenario der temporären Bühnen- und
+Veranstaltungsbeleuchtung, aus dem sich zunächst die Betriebsmodi ergeben. Auf dieser
+Grundlage werden die funktionalen Anforderungen komponentenbezogen für Bridge,
+Leuchtröhren und Kommunikation formuliert und um nicht-funktionale
+Qualitätsanforderungen ergänzt. Den Abschluss bildet die Abgrenzung jener Aspekte, die
+nicht Gegenstand der Arbeit sind. Die hier festgelegten Anforderungen bilden den
+Maßstab, an dem das System in Kapitel~\ref{chap:evaluierung} gemessen wird.
+
+\section{Systemkontext und Einsatzszenarien}
+\label{sec:systemkontext}
+
+Das System richtet sich an die Beleuchtung von Bühnen und Veranstaltungen, insbesondere
+an temporäre Aufbauten, die wiederholt auf- und abgebaut werden. Kennzeichnend für
+dieses Umfeld sind wechselnde Örtlichkeiten, knappe Aufbauzeiten und eine
+Signalverkabelung, die bei jedem Aufbau neu verlegt werden muss
+(Abschnitt~\ref{sec:problemstellung}).
+
+Am Betrieb beteiligt sind vier Akteure. Die Lichttechnikerin oder der Lichttechniker
+bedient eine bestehende Lichtsteuerung eine DMX-Konsole oder eine
+Steuerungssoftware, die den Lichtzustand als DMX-Universum ausgibt. Die Bridge nimmt
+dieses Signal entgegen und verteilt die für die Röhren bestimmten Kanäle. Die
+Leuchtröhren setzen die empfangenen Werte in Licht um. Konfiguriert werden Bridge und
+Röhren unmittelbar am Gerät, ohne zusätzliche Software.
+
+Aus diesem Kontext ergeben sich drei typische Einsatzszenarien. Im ersten steht eine
+vollständige Lichtsteuerung zur Verfügung. die Röhren sollen sich wie gewöhnliche
+DMX-Geräte in die bestehende Anlage einfügen, jedoch ohne Signalkabel auskommen. Im
+zweiten fehlt eine Lichtsteuerung, etwa bei kleineren Veranstaltungen. Das System soll
+dann selbstständig ein zusammenhängendes Lichtbild erzeugen. Im dritten wird eine
+einzelne Röhre ohne weitere Infrastruktur als reine Lichtquelle eingesetzt. Diese drei
+Szenarien führen unmittelbar auf die im folgenden Abschnitt festgelegten
+Betriebsmodi.
+
+\section{Betriebsmodi}
+\label{sec:betriebsmodi}
+
+Aus den beschriebenen Einsatzszenarien ergeben sich drei Betriebsmodi: Der
+\textit{Standalone-Modus} bezeichnet den Betrieb einer Leuchtröhre ohne Verbindung zur
+Bridge, der \textit{Master-Modus} den eigenständigen Betrieb der Bridge ohne externe
+Steuersignale und der \textit{DMX-Modus} den Funkempfang der Leuchtröhre, während die
+Bridge das DMX-Signal einer externen Lichtsteuerung entgegennimmt.
+
+\subsection{Standalone-Modus (Leuchtröhre)}
+\label{subsec:standalone-modus}
+
+Im Standalone-Modus kann die LED-Leuchtröhre vollständig
+autark betrieben werden, ohne dass eine Verbindung zur Bridge erforderlich ist. 
+Dieser Betriebsmodus bietet eine hohe Flexibilität für Anwendungsfälle, 
+in denen lediglich eine einfache Lichtquelle ohne komplexe Steuerung benötigt wird.
+
+Über das Menü am Gerät wählt der Benutzer die gewünschte Farbe sowie einen der
+vorgespeicherten Effekte aus beide werden unmittelbar auf den LED-Strip angewendet.
+
+Im Standalone-Modus entfällt jegliche Kommunikation mit externen Geräten. Die
+Leuchtröhre arbeitet vollständig eigenständig und benötigt lediglich eine
+Stromversorgung.
+
+\subsection{Master-Modus (Bridge)}
+\label{subsec:master-modus}
+
+Im Master-Modus empfängt die Bridge keine Steuersignale von außen, sondern erzeugt den
+Lichtzustand selbst. Sie durchläuft dabei selbstständig eine Folge vorgegebener Farben
+und Effekte und überträgt das Ergebnis über die Funkschnittstelle an alle Leuchtröhren.
+Das Tempo dieses Ablaufs lässt sich am Bedienmenü der Bridge über die Schlagzahl
+(Beats per Minute) einstellen, sodass sich die Effektwechsel an die Musik einer
+Veranstaltung anpassen lassen.
+
+Da sämtliche Röhren denselben Datenstrom empfangen, entsteht auch ohne externe
+Lichtsteuerung ein kohärentes Gesamtbild über alle Geräte hinweg. Der Modus eignet sich
+damit für einfachere Lichtinstallationen sowie für Veranstaltungen, bei denen keine
+Lichtsteuerung zur Verfügung steht oder deren Einrichtung nicht gerechtfertigt wäre.
+
+\subsection{DMX-Modus (Bridge und Leuchtröhre)}
+\label{subsec:dmx-modus}
+
+Im DMX-Modus empfängt die Bridge DMX-Steuersignale über eine
+kabelgebundene DMX-Leitung und überträgt die enthaltenen Steuerinformationen
+anschließend über eine Funkschnittstelle an die Leuchtröhren. Die Bridge
+bezieht dabei die in den DMX-Daten enthaltenen Kanalinformationen auf die an
+jeder Leuchtröhre individuell konfigurierbaren DMX-Adressen. Dadurch ist es
+möglich, an jeder Leuchtröhre dieselbe DMX-Adresse einzustellen, die auch in
+der verwendeten Lichtsteuerungssoftware für das jeweilige Gerät vergeben wurde.
+Die Leuchtröhren empfangen die von der Bridge gesendeten DMX-Pakete und setzen die
+darin enthaltenen Kanalwerte unmittelbar in entsprechende RGB-Lichtsignale um.
+Jede Leuchtröhre belegt in diesem Modus 4 DMX-Kanäle. 1 Kanal zur Auswahl 
+vorgespeicherter Effekte und 3 Kanäle für die RGB-Farbsteuerung. 
+Eine pixelgenaue Einzelansteuerung der LEDs ist in diesem Modus nicht
+vorgesehen.
+
+Der DMX-Modus eignet sich insbesondere für Einsatzszenarien, 
+in denen eine flexible Positionierung der Leuchtröhren ohne den Aufwand einer 
+aufwendigen Signalverkabelung erforderlich ist. Durch den Wegfall der 
+Kabelverbindungen zwischen Bridge und Leuchtröhren lässt sich der Aufbau 
+erheblich beschleunigen und vereinfachen.
+
+Über diese drei Modi hinaus ist ein kabelgebundener Betriebsmodus angestrebt, in dem
+die Bridge die einzelnen Pixel der Leuchtröhren über eine Datenleitung ansteuert und
+damit eine deutlich feinere Lichtgestaltung ermöglicht. Dieser Modus ist Gegenstand
+einer Weiterentwicklung und nicht Teil der vorliegenden Arbeit
+(Abschnitt~\ref{sec:abgrenzung}).
+
+\section{Funktionale Anforderungen}
+\label{sec:funktionale-anforderungen}
+
+Die funktionalen Anforderungen beschreiben die konkreten Fähigkeiten und
+Verhaltensweisen, die das System bereitstellen muss, um die in
+Abschnitt~\ref{sec:betriebsmodi} definierten Betriebsmodi zu realisieren.
+Die Anforderungen werden komponentenbezogen formuliert, um eine direkte
+Grundlage für die spätere Systemarchitektur zu schaffen.
+
+\subsection{Anforderungen an die Bridge}
+\label{subsec:fa-bridge}
+
+Die Bridge bildet das zentrale Steuerungselement des Systems und muss
+dementsprechend sämtliche eingehende Signalquellen verarbeiten sowie
+die erzeugten Steuerdaten an die Leuchtröhren weiterleiten können.
+
+Im DMX-Modus muss die Bridge in der Lage sein,
+DMX-Steuersignale über eine kabelgebundene DMX-Leitung gemäß dem DMX512-Standard
+zu empfangen und die enthaltenen Kanalinformationen zu extrahieren.
+Äquivalent dazu sollen auch Art-Net-Signale über eine Ethernet-Schnittstelle
+empfangen und verarbeitet werden können.
+Anschließend sind die eingehenden Signale in ein einheitliches internes
+Format zu überführen, das eine modusunabhängige Weiterverarbeitung ermöglicht.
+Die aufbereiteten Steuerdaten müssen anschließend gleichzeitig an alle
+angeschlossenen Leuchtröhren übermittelt werden.
+
+Zur Konfiguration des Betriebsmodus sowie weiterer systemrelevanter
+Parameter muss die Bridge über ein Bedienmenü verfügen, das eine
+direkte Einstellung am Gerät ohne externe Hilfsmittel ermöglicht.
+
+\subsection{Anforderungen an die LED-Leuchtröhren}
+\label{subsec:fa-roehre}
+
+Die LED-Leuchtröhren stellen die Ausgangskomponenten des Systems dar und
+müssen abhängig vom aktiven Betriebsmodus unterschiedliche Funktionalitäten
+bereitstellen.
+
+Im Standalone-Modus muss die Leuchtröhre vollständig autark operieren, ohne
+dass eine Kommunikationsverbindung zu anderen Systemkomponenten erforderlich
+ist. Über ein lokales Bedienmenü muss der Benutzer die gewünschte Lichtfarbe
+und Animation direkt am Gerät einstellen können.
+
+Im DMX-Modus muss die Leuchtröhre Steuerpakete über die
+Funkschnittstelle empfangen und die übertragenen Kanalwerte unmittelbar in
+entsprechende RGB-Lichtsignale umsetzen. Jede Leuchtröhre belegt dabei
+vier DMX-Kanäle: drei Kanäle für die individuelle Steuerung der
+Farbkomponenten Rot, Grün und Blau sowie einen weiteren Kanal zur Auswahl
+vorgespeicherter Pixelanimationen.
+
+Unabhängig vom Betriebsmodus muss jede Leuchtröhre über ein Bedienmenü
+verfügen, über das der gewünschte Betriebsmodus sowie modusabhängige
+Parameter konfiguriert werden können. Sämtliche vorgenommenen Einstellungen
+müssen persistent gespeichert und beim nächsten Einschalten des Geräts
+automatisch wiederhergestellt werden, damit die Geräte nach einem temporären
+Stromausfall ohne erneute Konfiguration weiterarbeiten.
+
+\subsection{Anforderungen an die Kommunikation}
+\label{subsec:fa-kommunikation}
+
+Die Kommunikationskomponente des Systems muss die zuverlässige
+Signalweiterleitung von der Bridge zu den Leuchtröhren gewährleisten.
+
+Für den drahtlosen Betriebsmodus ist eine Funkverbindung erforderlich, die
+eine ausreichende Reichweite besitzt, um typische Bühnenszenarien abzudecken.
+Hierbei werden 50 Meter als Mindestreichweite für den zuverlässigen Betrieb 
+der Leuchtröhren als Mindestanforderung festgelegt.
+Die Übertragung muss auch in hochfrequenzbelasteten Umgebungen, wie sie bei
+Veranstaltungen mit parallelem Betrieb zahlreicher Funkgeräte und WLAN-Systeme
+auftreten können, zuverlässig funktionieren. Die erreichbare Datenrate muss
+dabei ausreichen, um die DMX-Steuerdaten für alle angeschlossenen Leuchtröhren
+mit der für eine flüssige Lichtsteuerung notwendigen Aktualisierungsrate zu
+übertragen.
+
+Als Ausbaugröße wird festgelegt, dass das System bis zu 20 Leuchtröhren gleichzeitig
+versorgen können muss. Da jede Röhre vier DMX-Kanäle belegt, ergibt sich daraus ein zu
+übertragender Adressbereich von 80 Kanälen. Dieser Wert bildet zugleich die Grundlage
+für die Auslegung der Übertragung und für die in Kapitel~\ref{chap:evaluierung}
+verwendete Paketgröße.
+
+\section{Nicht-funktionale Anforderungen}
+\label{sec:nicht-funktionale-anforderungen}
+
+Die nicht-funktionalen Anforderungen definieren Qualitätseigenschaften des
+Systems, die über die reine Funktionalität hinausgehen und maßgeblich über
+die praktische Einsetzbarkeit sowie die Akzeptanz des Systems entscheiden.
+
+\subsection{Echtzeitverhalten}
+\label{subsec:echtzeitverhalten}
+
+Da das System zur Steuerung von Bühnenbeleuchtung eingesetzt wird, unterliegt
+es zeitkritischen Anforderungen. Die Gesamtlatenz zwischen dem Eingang eines
+Steuersignals an der Bridge und der entsprechenden Lichtausgabe an den
+Leuchtröhren muss unterhalb der Wahrnehmungsschwelle des menschlichen Auges
+liegen, sodass Steuereingriffe für das Publikum als unmittelbar erscheinen.
+
+Der Critical Flicker Fusion Threshold (CFFT) ist ein psychophysikalisches Maß 
+für die visuelle Zeitauflösung, also die schnellste Rate, bei der das visuelle 
+System des Menschen noch einzelne Lichtsignale unterscheiden kann. Dieser Wert 
+unterscheidet sich beim Menschen individuell, liegt aber typischerweise im 
+Bereich von 40 bis 60 Hz~\cite{haarlem2024speed}. 
+
+Da die einzelnen LED-Pixel nur bei neuen Instruktionen durch den Mikrocontroller
+aktualisiert werden und ansonsten dauerhaft leuchten, kann dieser Grenzwert automatisch
+als erfüllt angesehen werden. 
+
+Kritischer ist jedoch der Grenzwert für die Bewegungswahrnehmung (Motion Perception Threshold), 
+der bei etwa 15\,Hz liegt, optimalerweise sogar bei 24\,Hz~\cite{fujii2018}.
+
+Einen Sonderfall stellt das typische Einsatzszenario von Bühnenbeleuchtung dar, da hier häufig 
+sehr dunkle Umgebungen vorliegen. Unter solchen Bedingungen verschiebt sich die 
+Flimmerverschmelzungsfrequenz aufgrund der Anatomie des menschlichen Auges nach unten.
+
+Die Netzhaut verfügt über zwei Arten von Photorezeptoren, die sich in ihrer Funktion 
+deutlich unterscheiden. Stäbchen (engl. \textit{rods}) sind hochempfindlich und ermöglichen 
+das Sehen bei geringer Lichtintensität, besitzen jedoch eine vergleichsweise langsame 
+Zeitauflösung, ihre Flimmerverschmelzungsfrequenz liegt bei etwa 15\,Hz. Sie dominieren 
+daher das Sehen in dunklen Umgebungen. Zapfen (engl. \textit{cones}) sind hingegen für 
+das Farb- und Tagsehen bei höherer Lichtintensität zuständig und erreichen mit einer 
+Flimmerverschmelzungsfrequenz von bis zu 60\,Hz eine wesentlich höhere
+Zeitauflösung.
+
+Da bei Dunkelheit überwiegend die langsameren Stäbchen aktiv sind, sinkt die wahrnehmbare 
+Flimmerverschmelzungsfrequenz entsprechend ab~\cite{ramunae2025}.
+
+Ein Wert von 15\,Hz kann deshalb als genügend angesehen werden. Um
+Sicherheitsreserven vorzuhalten, wird dennoch ein Grenzwert von 24\,Hz angestrebt, 
+um auch in Situationen mit höherer Umgebungshelligkeit eine flüssige und reaktive 
+Lichtsteuerung zu gewährleisten.
+
+Das DMX512-Protokoll sieht eine maximale Aktualisierungsrate von 44~Hz
+vor \cite{ANSI_E1.11_2024,yang2015real}. Dieser Wert liegt bereits oberhalb der angestrebten Grenzwerte
+für die Bewegungswahrnehmung, sodass die Einhaltung der Echtzeit-Anforderung 
+mit DMX als unkritisch angesehen werden kann.
+
+Auch die zeitliche Konstanz der Frames ist von Bedeutung. Starke Schwankungen der
+Übertragungsverzögerung (Jitter) können zu einem unregelmäßigen Lichtverhalten führen,
+das selbst bei geringer bis mittlerer Bildrate als störend wahrgenommen wird.
+
+Aus diesen Überlegungen ergeben sich drei prüfbare Anforderungen. Erstens muss die
+Lichtausgabe mit mindestens 24\,Hz aktualisiert werden, ein einmal gesetzter
+Lichtzustand darf im Regelbetrieb nicht länger als 41,7\,ms gehalten werden. Zweitens
+darf die Gesamtlatenz zwischen dem Eingang eines Steuersignals an der Bridge und der
+Lichtausgabe an der Röhre denselben Wert von 41,7\,ms nicht überschreiten. Drittens
+muss der Jitter deutlich unterhalb des Abstands zweier aufeinanderfolgender Frames
+bleiben, damit sich die Schwankung nicht zu einer wahrnehmbaren Unregelmäßigkeit
+aufsummiert. Diese Grenzwerte bilden den Maßstab für die Messreihen in
+Kapitel~\ref{chap:evaluierung}.
+
+\subsection{Zuverlässigkeit und Robustheit}
+\label{subsec:zuverlaessigkeit}
+
+Im Veranstaltungsbetrieb beeinträchtigen Systemausfälle den Ablauf unmittelbar das
+System muss daher eine hohe Betriebszuverlässigkeit gewährleisten.
+Einzelne verlorene Pakete müssen ohne wahrnehmbare Wirkung auf die Lichtausgabe bleiben,
+und Unterbrechungen, welche die in Abschnitt~\ref{subsec:echtzeitverhalten} genannte
+Grenze von 41,7\,ms überschreiten, dürfen im Regelbetrieb nur vereinzelt auftreten.
+
+Die drahtlose Verbindung muss auch in hochfrequenzbelasteten Umgebungen stabil
+bleiben, wie sie bei Veranstaltungen mit einer Vielzahl gleichzeitig betriebener
+WLAN- und Bluetooth-Geräte typischerweise auftreten. Bei einem Verbindungsverlust
+muss das System ein definiertes Verhalten zeigen, wie das Einfrieren
+des zuletzt empfangenen Lichtzustands, um unkontrollierte Lichtausfälle zu
+vermeiden.
+
+Darüber hinaus muss das System gegenüber Fehlbedienungen durch den Anwender
+robust sein. Hierzu zählen beispielsweise die Eingabe ungültiger DMX-Adressen
+oder eine fehlerhafte Moduswahl. Solche Eingaben dürfen nicht zu einem
+undefinierten Systemzustand führen. Auch auf der Hardwareebene muss eine
+ausreichende mechanische Stabilität gewährleistet sein, da die Geräte im
+Veranstaltungsbetrieb gelegentlichen Stößen und raueren Handhabungsbedingungen
+ausgesetzt sein können.
+
+\subsection{Elektrische Belastbarkeit}
+\label{subsec:elektrische-belastbarkeit}
+
+Die elektrische Auslegung des Systems orientiert sich an der maximalen
+Leistungsaufnahme der verbauten LED-Strips. Jede Leuchtröhre enthält
+einen WS2815-LED-Strip mit einer Pixeldichte von 60~Pixeln pro Meter
+bei einer Betriebsspannung von 12\,V. Da jeder Pixel bei vollständiger
+Aussteuerung aller drei Farbkanäle eine Leistung von 0{,}2\,W aufnimmt,
+ergibt sich für eine Röhrenlänge von 2\,m eine maximale Leistungsaufnahme
+von
+\[
+  P_{\max} = 60 \times 2 \times 0{,}2\,\text{W} = 24\,\text{W}.
+\]
+Bei einer Versorgungsspannung von 12\,V folgt daraus ein maximaler
+Betriebsstrom von
+\[
+  I_{\max} = \frac{P_{\max}}{U} = \frac{24\,\text{W}}{12\,\text{V}} = 2\,\text{A}.
+\]
+
+Alle stromführenden Komponenten, insbesondere Leiterbahnen, Steckverbinder
+und Schutzschaltungen, müssen so dimensioniert sein, dass sie diesen Strom im
+Dauerbetrieb ohne unzulässige Erwärmung oder Ausfälle führen können, die Auslegung
+erfolgt dabei mit Reserve gegenüber dem berechneten Wert. Gleiches gilt für das eingesetzte Netzteil, das die geforderte
+Leistung dauerhaft und ohne signifikante Spannungseinbrüche bereitstellen
+muss, um einen stabilen Betrieb auch bei längeren Veranstaltungen zu
+gewährleisten.
+
+\subsection{Benutzerfreundlichkeit}
+\label{subsec:benutzerfreundlichkeit}
+
+Ein wesentliches Ziel der Systementwicklung ist die Minimierung des
+Einrichtungsaufwands. Als Kriterium wird festgelegt, dass sich sämtliche für den Betrieb
+erforderlichen Parameter Betriebsmodus, DMX-Adresse, Funkkanal, Farbe und Effekt
+ausschließlich am Gerät einstellen lassen müssen, ohne zusätzliche Software, ohne
+Netzwerkzugang und ohne schriftliche Anleitung. Die Bedienoberfläche muss dafür
+selbsterklärend gestaltet sein.
+
+Die Konfiguration von Betriebsmodus und weiteren betriebsrelevanten Parametern
+erfolgt über das Bedienmenü der jeweiligen Geräte. Um die Übersichtlichkeit
+zu wahren, sollen dabei ausschließlich die für den jeweils aktiven Betriebsmodus
+relevanten Einstellungen angezeigt werden. Sämtliche vorgenommenen
+Konfigurationen müssen persistent im Gerät gespeichert werden und stehen nach
+einem Neustart ohne erneuten Einrichtungsaufwand sofort zur Verfügung.
+
+\subsection{Wirtschaftlichkeit und Portabilität}
+\label{subsec:wirtschaftlichkeit}
+
+Das entwickelte System soll eine kosteneffiziente Alternative zu kommerziellen
+drahtlosen DMX-Lösungen darstellen, die für private Personen, kleinere Produktionen und
+experimentelle Installationen zugänglich ist. Bei der Komponentenauswahl
+ist daher auf ein günstiges Preis-Leistungs-Verhältnis zu achten, ohne
+die funktionalen und qualitativen Anforderungen zu kompromittieren. Die Materialkosten
+sind damit ein Entwurfskriterium. eine betriebswirtschaftliche Bewertung des Systems
+findet dagegen nicht statt (Abschnitt~\ref{sec:abgrenzung}).
+
+Hinsichtlich der Portabilität sind eine kompakte Bauform und ein geringes
+Gewicht aller Systemkomponenten anzustreben, um den Transport und den Aufbau
+an wechselnden Veranstaltungsorten zu erleichtern. Darüber hinaus muss das
+System ohne Anpassungen in bestehende DMX-basierte Lichtsteuerungsinfrastrukturen
+integrierbar sein, um den Einsatz neben vorhandener Technik zu ermöglichen.
+
+\section{Abgrenzung}
+\label{sec:abgrenzung}
+
+Die folgende Abgrenzung definiert, welche Funktionalitäten und Aspekte nicht Teil dieser Arbeit sind:
+
+\begin{itemize}
+    \item \textbf{DMX-Konsole}: Das entwickelte System stellt keine vollständige DMX-Konsole dar, sondern dient ausschließlich der Weiterleitung und drahtlosen Übertragung von DMX-Signalen.
+    
+    \item \textbf{Lichtplanung und Programmierung}: Die Planung von Lichtszenen und die Programmierung von Lichteffekten erfolgt über externe Software oder DMX-Konsolen. Das System bietet keine eigene Programmierumgebung.
+    
+    \item \textbf{Gerätetypen}: Das System ist auf die Ansteuerung von LED-Leuchtröhren beschränkt. Andere Beleuchtungsgeräte wie Moving Heads, Scanner oder herkömmliche PAR-Scheinwerfer werden nicht unterstützt.
+    
+    \item \textbf{Bidirektionale Kommunikation}: Eine bidirektionale Kommunikation ist nicht vorgesehen. Das System arbeitet ausschließlich mit unidirektionaler Signalübertragung.
+    
+    \item \textbf{Weitere Protokolle}: Neben DMX und Art-Net werden keine weiteren Steuerungsprotokolle wie sACN (Streaming ACN) oder KiNET unterstützt.
+
+    \item \textbf{Kabelgebundene Pixelsteuerung}: Ein Betriebsmodus, in dem die Bridge die
+    einzelnen Pixel der Leuchtröhren über eine Datenleitung ansteuert, wird als
+    Weiterentwicklung angestrebt, ist jedoch nicht Gegenstand dieser Arbeit.
+
+    \item \textbf{Wirtschaftlichkeit}: Die Materialkosten der Komponenten sind ein
+    Entwurfskriterium (Abschnitt~\ref{subsec:wirtschaftlichkeit}), eine
+    betriebswirtschaftliche Bewertung findet dagegen nicht statt. Das Projekt zielt nicht
+    darauf ab, ein gewinnbringendes Produkt zu entwerfen, sondern wird in einem
+    semi-professionellen Rahmen eigengenutzt.
+\end{itemize}

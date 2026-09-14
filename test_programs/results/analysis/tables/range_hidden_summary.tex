@@ -1,0 +1,19 @@
+% Requires \usepackage{booktabs}; otherwise replace \toprule etc. with \hline.
+\begin{table}[htbp]
+  \centering
+  \small
+  \begin{tabular}{lrrrrrrr}
+    \toprule
+    Messpunkt & Verlust & Fenster p95 & Kopien & Jitter & max. Ausfall & Fenster & RSSI \\
+    & [\%] & [\%] & je Seq. & [ms] & [ms] & ab 50 ms [\%] & [dBm] \\
+    \midrule
+    10 m & 0,48 & 0 & 4,80 & 6,96 & 75 & 1,67 & $-$81,23 \\
+    50 m & 2,08 & 10,08 & 3,57 & 9,23 & 225 & 7,33 & $-$77,85 \\
+    100 m & 10,86 & 36,64 & 2,72 & 16,45 & 575 & 37 & $-$82,97 \\
+    150 m & 27,18 & 60,80 & 1,87 & 26,59 & 700 & 80 & $-$48,70 \\
+    200 m & 36,29 & 63,67 & 1,61 & 32,12 & 950 & 95,67 & $-$77,39 \\
+    \bottomrule
+\end{tabular}
+\caption{Reichweitenmessung (ohne Sichtverbindung)}
+  \label{tab:range-hidden-summary}
+\end{table}

@@ -1,0 +1,16 @@
+% Requires \usepackage{booktabs}; otherwise replace \toprule etc. with \hline.
+\begin{table}[htbp]
+  \centering
+  \small
+  \begin{tabular}{lrrrrrrr}
+    \toprule
+    Szenario & Verlust & Fenster p95 & Kopien & Jitter & max. Ausfall & Fenster & RSSI \\
+    & [\%] & [\%] & je Seq. & [ms] & [ms] & ab 50 ms [\%] & [dBm] \\
+    \midrule
+    Nebenzeit & 0,01 & 0 & 4,57 & 6,47 & 25 & 0 & $-$83,72 \\
+    Stoßzeit & 0,51 & 2,50 & 3,83 & 8,45 & 750 & 0,33 & $-$84,02 \\
+    \bottomrule
+\end{tabular}
+\caption{Messergebnisse Störfestigkeit}
+  \label{tab:interference-summary}
+\end{table}

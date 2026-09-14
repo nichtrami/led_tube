@@ -1,0 +1,281 @@
+\chapter{Diskussion und Ausblick}
+\label{chap:diskussion-und-ausblick}
+
+\section{Diskussion der Ergebnisse}
+\label{sec:diskussion-der-ergebnisse}
+
+\subsection{Redundanz statt Quittierung}
+\label{subsec:diskussion-redundanz}
+
+Die zentrale Entwurfsentscheidung der Funkstrecke besteht darin, auf einen
+Rückkanal zu verzichten und die fehlende Zustellgarantie stattdessen durch
+mehrfache Aussendung desselben Datenstands zu kompensieren
+(Abschnitt~\ref{subsec:drahtlose-uebertragung}). Diese Entscheidung war zum
+Zeitpunkt des Entwurfs eine Annahme: die Messungen belegen nun ihre
+Tragfähigkeit. Über eine Distanz von 100\,m mit Sichtverbindung bleibt der
+Sequenzverlust bei 0,09\,\%, obwohl die Empfangsredundanz zu diesem Zeitpunkt
+bereits von fünf auf 4,43 Kopien je Sequenzwert gesunken ist. Die Strecke
+verliert also messbar an Qualität, ohne dass sich dies auf die Lichtausgabe
+auswirkt, genau dies ist die Funktion, die der Redundanz zugedacht war.
+
+Aus dieser Beobachtung folgt ein Gedanke, der über die Bewertung der einzelnen
+Messreihe hinausreicht. Die Empfangsredundanz ist eine Zustandsgröße der
+Funkstrecke, die ohne Rückkanal allein empfängerseitig bestimmbar ist. Die
+Röhre kann zählen, wie viele Kopien eines Sequenzwerts sie erhalten hat, und
+daraus auf die verbleibende Fehlerreserve schließen. Ein unidirektional
+ausgelegtes System kann seinen eigenen Verbindungszustand somit kennen, ohne die
+in Abschnitt~\ref{sec:abgrenzung} bewusst ausgeschlossene bidirektionale
+Kommunikation einzuführen. Diese Eigenschaft ist die Voraussetzung für jede Form
+der Selbstanpassung und wird in Abschnitt~\ref{subsec:ausblick-messungen} wieder
+aufgegriffen.
+
+Die Messungen erlauben darüber hinaus eine genauere Bestimmung dessen, wogegen
+die Redundanz überhaupt schützt. Die fünf Kopien eines Sequenzwerts werden
+innerhalb desselben 25-ms-Fensters ausgesendet
+(Abschnitt~\ref{subsec:messaufbau}). Die Redundanz ist damit eine rein zeitliche
+Wiederholung innerhalb eines sehr kurzen Intervalls. Sie wirkt folglich gegen
+unkorrelierte Einzelverluste eine Kollision, eine kurzzeitige
+Kanalbelegung, ein einzelnes gestörtes Paket, weil in diesen Fällen mindestens
+eine der übrigen Kopien den Empfänger erreicht. Gegen korrelierte Störungen,
+die länger als 25\,ms andauern, ist sie hingegen wirkungslos: Überschreitet die
+Störung dieses Fenster, gehen alle fünf Kopien desselben Werts gemeinsam verloren.
+
+Genau dieses Verhalten belegen beide Messreihen. Die Unterbrechung von 750\,ms im
+Stoßzeitlauf umfasst 30 aufeinanderfolgende Sequenzwerte und damit 150 einzeln
+ausgesendete Pakete. Ebenso wachsen mit zunehmender Distanz nicht nur die
+Verlustraten, sondern vor allem die Längen der zusammenhängenden Verlustserien.
+Der praktisch relevante Fehlerfall ist somit nicht der Einzelverlust, gegen den
+das Verfahren ausgelegt ist, sondern der zeitlich ausgedehnte Ausfall. Daraus
+folgt eine Einschränkung für jede Weiterentwicklung des Ansatzes: Eine bloße
+Erhöhung der Kopienzahl innerhalb desselben Fensters verbessert die Robustheit
+gegenüber solchen Ereignissen nicht.
+
+Ebenso deutlich zeigen die Messungen die Grenze des Prinzips. Der Sequenzverlust
+wächst nicht proportional zur Verschlechterung der Strecke, sondern bleibt lange
+nahezu unverändert und springt anschließend sprunghaft an, sobald die Redundanz
+gegen eins geht. Im verdeckten Lauf über 200\,m stehen im Mittel noch 1,61 Kopien
+je Sequenzwert zur Verfügung, in einzelnen Fenstern genau eine und der Verlust
+erreicht 36,29\,\%. Das Verfahren puffert also über einen weiten Bereich sehr
+wirkungsvoll und versagt dann innerhalb einer kurzen Spanne. Für die Praxis
+bedeutet dies, dass ein System, das nur den Sequenzverlust beobachtet, keine
+Vorwarnzeit besitzt: Bis kurz vor dem Zusammenbruch der Verbindung erscheint die
+Übertragung fehlerfrei.
+
+\subsection{Broadcast ohne Rückkanal}
+\label{subsec:diskussion-broadcast}
+
+Der Verzicht auf Quittierung ist Teil einer umfassenderen Entscheidung für eine
+verbindungslose Broadcast-Topologie. Ihr Gewinn liegt in der Einfachheit: Der
+Sendeaufwand der Bridge ist unabhängig von der Anzahl der Empfänger, alle Röhren
+erhalten denselben Datenstand innerhalb desselben Übertragungsfensters, und die
+Adressierung erfolgt lokal am Gerät statt über ein Funkprotokoll
+(Abschnitt~\ref{subsec:synchronisation-roehem}). Die Gleichzeitigkeit ist dabei
+nicht nur eine Eigenschaft des Entwurfs, sondern messtechnisch bestätigt: In der
+Zeitlupenaufnahme mit 120~Bildern je Sekunde wechseln acht gemeinsam betriebene
+Röhren innerhalb desselben Einzelbildes
+(Abschnitt~\ref{sec:gleichzeitigkeit}). Der Preis dafür ist ebenso klar:
+Es existiert weder ein Zustellnachweis noch eine Möglichkeit zur Ferndiagnose. Ein
+Ausfall einzelner Röhren wird nicht gemeldet, sondern erst optisch sichtbar.
+
+Die Störfestigkeitsmessung erlaubt es, diesen Zielkonflikt genauer zu bewerten,
+als es beim Entwurf möglich war. Das einzige praktisch relevante Ereignis des
+Stoßzeitlaufs eine zusammenhängende Unterbrechung von 750\,ms lässt sich am
+ehesten auf die Konkurrenz um den Übertragungskanal zurückführen und nicht auf
+die fehlerhafte Zustellung einzelner Pakete: Sämtliche Kopien des betroffenen
+Zeitabschnitts blieben aus, während Abstand und Aufbau unverändert waren
+(Abschnitt~\ref{sec:stoerfestigkeit}). Ein unmittelbarer Nachweis ist mit dem
+verwendeten Aufbau nicht möglich, da senderseitig nicht protokolliert wird, ob
+ein Paket abgesetzt werden konnte. Unter dieser Deutung hätte ein
+Quittierungsverfahren das Ereignis nicht verhindert. Es hätte den Ausfall
+lediglich erkennbar gemacht und zugleich zusätzliche Sendevorgänge auf einem
+bereits ausgelasteten Kanal erzeugt.
+Die Entscheidung gegen den Rückkanal wird durch die Messung also nicht relativiert,
+sondern gestützt allerdings mit der Einschränkung, dass die fehlende
+Rückmeldung den Betreiber im Fehlerfall ohne Information lässt.
+
+Der Zugriff auf das Medium erfolgt nach demselben CSMA/CA-Verfahren wie
+bei WLAN, sodass die verfügbare Sendezeit mit der Fremdlast auf dem gewählten
+Kanal konkurriert. Die Implementierung sieht hierfür drei gespreizte Kanäle vor
+(Abschnitt~\ref{subsec:espnow}), überlässt die Auswahl jedoch dem Anwender. Der
+Betrieb hängt damit an einer Konfigurationsentscheidung, die vor der Veranstaltung
+zu treffen ist.
+
+\subsection{Reichweite als Eigenschaft des Aufbaus}
+\label{subsec:diskussion-abschattung}
+
+Der aufschlussreichste Befund der Reichweitenmessung ist nicht die erreichte
+Maximaldistanz, sondern der Vergleich beider Messreihen. Dieselbe Hardware, derselbe
+Kanal und dieselbe Sendeleistung führen zu deutlich unterschiedlichen Ergebnissen,
+je nachdem, ob die Sichtlinie frei ist oder durch ein massives Bauteil unterbrochen
+wird. Die verdeckte Strecke verhält sich näherungsweise wie eine etwa doppelt so
+lange freie Strecke (Abschnitt~\ref{subsec:reichweite-bewertung}). Reichweite ist
+demnach keine Eigenschaft des Geräts, sondern eine Eigenschaft des Aufbaus. Für die
+Anwendung folgt daraus eine unmittelbar umsetzbare Konsequenz: Die Positionierung
+der Bridge auf einer möglichst freien Sichtachse und in erhöhter Lage wirkt
+stärker auf die Verbindungsqualität als jede Steigerung der Sendeleistung, und eine
+ungünstig platzierte Bridge lässt sich durch Reserven auf der Funkstrecke nicht
+ausgleichen.
+
+Dieser Befund verbindet die Arbeit mit der in
+Abschnitt~\ref{subsec:forschung-kommunikation} beschriebenen Lösung von Yang et al.
+Dort werden abgeschattete Empfänger über ein Kabel an einen erreichbaren Empfänger
+angebunden, also durch das Wiedereinführen genau jener Verkabelung, deren
+Vermeidung das erklärte Ziel des Ansatzes war. Die vorliegende Messreihe
+quantifiziert erstmals, wie groß das zugrunde liegende Problem tatsächlich ist,
+und zeigt zugleich, dass es im geforderten Einsatzbereich nicht zu diesem
+Rückschritt zwingt: Bei der in Abschnitt~\ref{subsec:fa-kommunikation}
+festgelegten Mindestreichweite von 50\,m bleibt die Übertragung auch bei
+vollständig verdecktem Empfänger mit 2,08\,\% Sequenzverlust nutzbar.
+
+Für den Fall größerer oder ungünstigerer Strecken bieten sich Gegenmaßnahmen an,
+die den kabellosen Charakter des Systems erhalten. Naheliegend ist die Verteilung
+mehrerer Bridges auf ein Veranstaltungsgelände, sodass jede Röhre eine kurze,
+möglichst freie Strecke zu einem Sender besitzt. Die Broadcast-Topologie steht dem
+nicht entgegen, erfordert jedoch die zuweise zu unterschiedlichen Kanälen 
+inerhalb eines Sendebereichs um Interferenze zu vermeiden.
+Ebenso wirksam ist die Ausrichtung und
+Wahl der Antennen, die im vorliegenden Aufbau als externe Bauform ausgeführt sind
+(Abschnitt~\ref{subsec:funk-antenne}) und damit ohne Eingriff in die Elektronik
+getauscht werden können.
+
+\subsection{Einordnung in den Stand der Technik}
+\label{subsec:diskussion-einordnung}
+
+Die in Abschnitt~\ref{sec:luecken-stand-der-technik} formulierte Lücke betraf
+weniger die drahtlose Übertragung als solche als vielmehr den Grad der
+Integration: Die betrachteten Arbeiten ersetzen jeweils nur die Übertragungsstrecke
+zwischen Steuergerät und Leuchtmittel, während das Leuchtmittel selbst
+kabelgebunden angesteuert bleibt. Das entwickelte System vereint Funkempfang,
+Energieversorgung und Pixel Ansteuerung innerhalb der Röhre. Die
+funktionale Verifikation in Abschnitt~\ref{sec:funktionale-tests} belegt, dass
+mehrere unabhängig adressierte Röhren allein über die Funkstrecke betrieben
+werden, und die Reichweitenmessung zeigt, dass dies über praxisrelevante
+Distanzen trägt. Die Signalverkabelung entfällt damit vollständig und nicht nur
+abschnittsweise.
+
+Ein zweiter Beitrag betrifft die Bewertungsgrundlage. Die Leistungsbewertung in
+\cite{yang2015real} beschränkt sich auf den Nachweis der Timing-Konformität.
+Reichweite, Paketverlust und Verhalten unter Fremdfunklast bleiben unbetrachtet.
+Die vorliegende Arbeit erhebt genau diese Größen und macht darüber hinaus die
+Struktur der Verluste sichtbar. Dass ein Lauf mit 0,51\,\% mittlerem Verlust eine
+zusammenhängende Unterbrechung von 750\,ms enthalten kann, während alle übrigen
+Fenster nahezu fehlerfrei sind, ist für die Lichtwahrnehmung entscheidend und
+bleibt bei einer Betrachtung von Mittelwerten unsichtbar. Die in
+Abschnitt~\ref{subsec:metriken} eingeführte Trennung von Sequenzverlust und
+Empfangsredundanz sowie die Auswertung der Verlustserien sind insofern
+übertragbar auf andere funkgestützte Lichtsteuerungen und nicht auf das hier
+entwickelte System beschränkt.
+
+Gegenüber dem kommerziellen Premiumsegment bleiben Unterschiede bestehen, die
+nicht auf die Übertragung, sondern auf den Funktionsumfang der Leuchte entfallen.
+Die in Abschnitt~\ref{sec:kommerzielle-led-leuchtroehren} betrachtete
+\textit{Titan Tube} bietet Akkubetrieb, eine Schutzart für den Außeneinsatz sowie
+eine erweiterte Farbmischung mit zusätzlichen Mint- und Amber-Dioden, die eine
+Anpassung des Weißabgleichs erlaubt. Das entwickelte System bleibt demgegenüber
+netzgebunden und auf eine RGB-Mischung beschränkt. Die kabelgebundene
+Pixelsteuerung ist auf der Bridge-Platine bereits vorbereitet, war jedoch
+ausdrücklich nicht Gegenstand dieser Arbeit
+(Abschnitt~\ref{subsec:bridge-pcb}).
+
+Ein Vergleich der Kosten ist vor diesem Hintergrund nur mit Einschränkungen
+aussagekräftig, verdeutlicht aber die Größenordnung. Den in
+Abschnitt~\ref{sec:kommerzielle-led-leuchtroehren} genannten Endkundenpreisen von
+etwa 800\,€ je Röhre im Premiumsegment und rund 400\,€ je Röhre bei
+kostengünstigeren Systemen stehen Materialkosten von etwa 62\,€ je Röhre und rund
+31\,€ je Bridge gegenüber (Abschnitt~\ref{subsec:gesamtkosten}). Diese Zahlen sind
+jedoch nicht unmittelbar vergleichbar: Den die Bestückung
+der Platinen, der 3D-Druck der Gehäuse, der mechanische Zusammenbau sowie die
+Prüfung jeder Einheit, die im Eigenbau als Arbeitszeit anfallen und bei einem
+Fertigprodukt im Preis enthalten sind fehlen. in diesen Preis. Ebenso wenig enthalten sind ein
+EMV- und CE-Konformitätsnachweis und Gewährleistung.
+Der Vergleich belegt daher nicht, dass das System um eine Größenordnung
+günstiger ist, sondern dass die Materialkosten einer solchen Leuchte
+deutlich unterhalb der Marktpreise liegen und der Eigenbau damit für Anwender
+erschlossen wird, für die kommerzielle Systeme wirtschaftlich nicht in Frage
+kommen. Eine weitergehende wirtschaftliche Betrachtung ist entsprechend der
+Abgrenzung in Abschnitt~\ref{sec:abgrenzung} nicht Gegenstand dieser Arbeit.
+
+\subsection{Grenzen der Aussagekraft}
+\label{subsec:diskussion-aussagekraft}
+
+Die messtechnischen Einschränkungen sind in Abschnitt~\ref{sec:grenzen}
+aufgeführt. Darüber hinaus ist zu berücksichtigen, wie weit die Ergebnisse
+überhaupt verallgemeinert werden können.
+
+Sämtliche Messreihen wurden mit einem Prototyp, an jeweils einem Standort und auf
+einem einzigen Kanal erhoben. Insbesondere umfasst der Messaufbau nur eine
+empfangende Röhre. Der funktionale Betrieb wurde zwar mit acht gleichzeitig
+angesteuerten Röhren erprobt (Abschnitt~\ref{sec:funktionale-tests}) und damit
+mit knapp der Hälfte der geforderten Ausbaugröße quantitativ vermessen wurde
+dieser Fall jedoch nicht. Dass zusätzliche Röhren die Funkstrecke nicht
+zusätzlich belasten, folgt aus der Broadcast-Topologie.
+
+\section{Fazit}
+\label{sec:fazit}
+
+Ziel dieser Arbeit war die Entwicklung eines Beleuchtungssystems, das
+DMX-Steuersignale drahtlos an mehrere LED-Leuchtröhren überträgt
+(Abschnitt~\ref{sec:zielsetzung}). Dieses Ziel wurde erreicht. Das System besteht
+aus einer Bridge, die Steuerdaten aus einer bestehenden Lichtinfrastruktur
+entgegennimmt oder im Master-Modus selbst erzeugt, sowie aus Leuchtröhren, die
+den für ihre Adresse bestimmten Abschnitt des Datenstroms extrahieren und
+unmittelbar in Licht umsetzen. Beide Betriebsarten der Bridge und der autarke
+Einzelbetrieb der Röhre wurden am aufgebauten System verifiziert.
+
+Die Anforderung an das Echtzeitverhalten wird erfüllt und der Jitter bleibt im gesamten
+praxisrelevanten Bereich deutlich unterhalb des Frameabstands. Unter
+Idealbedingungen wurde kein einziger Sequenzwert verloren. Die geforderte
+Mindestreichweite von 50\,m wird mit freier Sicht deutlich übertroffen und auch
+bei vollständig verdecktem Empfänger erreicht. Unter realer, wenn auch moderater
+Fremdfunklast bleibt die Übertragung zuverlässig. Die verbleibende Schwachstelle
+ist nicht die mittlere Verlustrate, sondern das vereinzelte Auftreten längerer
+Unterbrechungen infolge von Kanalkonkurrenz.
+
+Der zweite Zielaspekt die niedrigschwellige Nachbaubarkeit wurde durch die
+Beschränkung auf frei verfügbare Komponenten und die vollständige Offenlegung des
+Systems umgesetzt. Firmware, Platinenlayouts und Gehäusemodelle liegen unter einer
+freien Lizenz vor (\url{https://github.com/nichtrami/led_tube}), sodass sowohl der
+Nachbau als auch die Weiterentwicklung durch Dritte möglich ist. Damit adressiert die Arbeit beide Bestandteile der in
+Kapitel~\ref{chap:stand-der-technik} identifizierten Lücke: den Integrationsgrad,
+indem Funkempfang und Leuchtmittel als Gesamtsystem entworfen wurden, und die
+Verfügbarkeit, indem das Ergebnis reproduzierbar dokumentiert und offengelegt ist.
+
+\section{Ausblick}
+\label{sec:ausblick}
+
+\subsection{Aus den Messungen abgeleitete Weiterentwicklungen}
+\label{subsec:ausblick-messungen}
+
+Die Messreihen weisen mit der Empfangsredundanz auf eine Größe hin, die sich als
+Ansatzpunkt für mehrere aufeinander aufbauende Verbesserungen eignet. Sie sinkt
+bereits messbar, während der Sequenzverlust noch nahezu bei null liegt, und ist
+empfängerseitig ohne Rückkanal bestimmbar
+(Abschnitt~\ref{subsec:diskussion-redundanz}).
+
+Die einfachste Nutzung besteht darin, sie sichtbar zu machen. Eine Anzeige der
+Verbindungsqualität im Bedienmenü der Röhre erfordert keine Änderung des
+Übertragungsverfahrens, da die notwendige Information bereits im Empfangspfad
+vorliegt, und gäbe dem Anwender beim Aufbau eine unmittelbare Rückmeldung darüber,
+ob eine gewählte Position tragfähig ist.
+
+\subsection{Funktionale Erweiterungen des Gesamtsystems}
+\label{subsec:ausblick-funktional}
+
+Neben den aus den Messungen abgeleiteten Verbesserungen bestehen
+Erweiterungsmöglichkeiten, die den Funktionsumfang des Systems betreffen.
+
+Der naheliegendste Schritt ist die kabelgebundene Pixelsteuerung über Art-Net. Die
+Bridge-Platine sieht hierfür bereits einen über RS-485 geführten Ausgang für die
+LED-Datenleitung vor (Abschnitt~\ref{subsec:bridge-pcb}), und die Architektur
+überführt sämtliche Eingangsprotokolle ohnehin in ein einheitliches internes
+Format (Abschnitt~\ref{subsec:internes-protokoll}). Damit würde das System jene
+Betriebsart erschließen, die im Premiumsegment die höhere Auflösung ermöglicht,
+und wäre in Aufbauten einsetzbar, in denen eine Datenleitung ohnehin verlegt wird.
+
+Schließlich betrifft eine Weiterentwicklung das Projekt selbst. Da Firmware,
+Platinenlayouts und Gehäusemodelle offengelegt sind, entscheidet die Qualität der
+Dokumentation darüber, ob ein Nachbau durch Dritte tatsächlich gelingt. Eine
+aufbereitete Bau- und Inbetriebnahmeanleitung, die die in
+Abschnitt~\ref{subsec:benutzerfreundlichkeit} formulierte Anforderung an den
+geringen Einrichtungsaufwand auf den Nachbau überträgt, wäre die konsequente
+Fortführung des Open-Source-Ansatzes dieser Arbeit.

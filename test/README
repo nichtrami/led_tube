@@ -1,0 +1,34 @@
+-Anforderungen an die LED Tube-
+
+V1.0
+( )Acrylglas Röhre XT
+( )Anschluss entweder in Ablschlusskappe oder an Endstück, dass aufgesetzt wird
+( )MPU: ATmega328
+( )DMX Steuerung
+-> Dip Switch um DMX Adresse einstellen zu können (bis 256)
+( )mit dem 9. Schalter kann umgeschalten werden in den Automatik Modus, in dem einfach wahllos Effekte mit 125 BPM angezeigt werden, im automatikmodus über alle kanäle senden
+->(konzept der modus wahl nochmal überdenkne)
+und dem DMX Modus in dem die Tube angesteuert werden kann.
+( )DMX Modi: Farbe auswählen in Wertebereich zwischen 0-255 (Hue) 0-200 => Hue Farbraus/ 201-255 => Farbkombinationen, Helligkeit auf dem zweiten Channel,  und Effektauswahl auf dem 3. 
+Effekte: Alles bleibt Dauerhaft an
+Langsamer snake von oben nach unten
+schnelle snake von oben nach unten (eventuell mehr geschwindigkeitsabstufungen
+)
+Langsamer snake von unten nach oben
+schnelle snake von unten nach oben
+strobo
+pulsieren schnell
+pusieren langsam
+doppel pulsieren
+RGB Modus in man rot grün und blau einfach an die leds weitergibt(ausgewählt, wenn 9 auf 0 ist sonst normaler modus (effekt, color, brightness)
+
+
+V2.0
+MPU: ESP32
+Bluetooth Verbindung 
+Steuerung über App
+verbauter Akku für ca. 10h Laufzeit
+Automatikmodus mit Mikrofon
+DMX Adressen bis 512 möglich (größeren Dip Switch wählen oder Funktionstasten hinzufügen)
+überlegen, ob Display zur Bedienung sinnvoll ist
+Sicherheitsrichtlinien der Elektronik zum Verkauf müsse recherchiert und eingehalten werden
